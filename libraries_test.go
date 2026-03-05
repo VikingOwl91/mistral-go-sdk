@@ -51,7 +51,7 @@ func TestListLibraries_Success(t *testing.T) {
 	defer server.Close()
 
 	client := NewClient("key", WithBaseURL(server.URL))
-	resp, err := client.ListLibraries(context.Background())
+	resp, err := client.ListLibraries(context.Background(), nil)
 	if err != nil {
 		t.Fatal(err)
 	}

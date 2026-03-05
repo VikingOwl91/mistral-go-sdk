@@ -21,8 +21,8 @@ func TestUnmarshalEntry_MessageInput(t *testing.T) {
 	if e.Role != "user" {
 		t.Errorf("got role %q", e.Role)
 	}
-	if TextContent(e.Content) != "Hello" {
-		t.Errorf("got content %q", TextContent(e.Content))
+	if e.Content.String() != "Hello" {
+		t.Errorf("got content %q", e.Content.String())
 	}
 }
 
@@ -36,8 +36,20 @@ func TestUnmarshalEntry_MessageOutput(t *testing.T) {
 	if !ok {
 		t.Fatalf("expected *MessageOutputEntry, got %T", entry)
 	}
-	if TextContent(e.Content) != "Hi there!" {
-		t.Errorf("got content %q", TextContent(e.Content))
+	if e.Content.String() != "Hi there!" {
+		t.Errorf("got content %q", e.Content.String())
+	}
+}
+
+func TestUnmarshalEntry_MessageInput_ArrayContent(t *testing.T) {
+	data := []byte(`{"object":"entry","id":"e1","type":"message.input","created_at":"2024-01-01T00:00:00Z","role":"user","content":[{"type":"text","text":"Hello"}]}`)
+	entry, err := UnmarshalEntry(data)
+	if err != nil {
+		t.Fatal(err)
+	}
+	e := entry.(*MessageInputEntry)
+	if len(e.Content.Parts) != 1 {
+		t.Fatalf("got %d parts, want 1", len(e.Content.Parts))
 	}
 }
 
@@ -108,38 +120,41 @@ func TestUnmarshalEntry_AgentHandoff(t *testing.T) {
 }
 
 func TestUnmarshalEntry_Unknown(t *testing.T) {
-	_, err := UnmarshalEntry([]byte(`{"type":"unknown.type"}`))
-	if err == nil {
-		t.Error("expected error for unknown type")
+	entry, err := UnmarshalEntry([]byte(`{"type":"future.type","id":"x"}`))
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	u, ok := entry.(*UnknownEntry)
+	if !ok {
+		t.Fatalf("expected *UnknownEntry, got %T", entry)
+	}
+	if u.Type != "future.type" {
+		t.Errorf("got type %q", u.Type)
+	}
+	if len(u.Raw) == 0 {
+		t.Error("expected raw data")
 	}
 }
 
-func TestTextContent_String(t *testing.T) {
-	raw := json.RawMessage(`"Hello world"`)
-	if TextContent(raw) != "Hello world" {
-		t.Errorf("got %q", TextContent(raw))
+func TestUnmarshalEntry_MessageOutput_NullContent(t *testing.T) {
+	data := []byte(`{"object":"entry","id":"e2","type":"message.output","created_at":"2024-01-01T00:00:00Z","role":"assistant","content":null}`)
+	entry, err := UnmarshalEntry(data)
+	if err != nil {
+		t.Fatal(err)
+	}
+	e := entry.(*MessageOutputEntry)
+	if !e.Content.IsNull() {
+		t.Error("expected null content")
 	}
 }
 
-func TestTextContent_ChunkArray(t *testing.T) {
-	raw := json.RawMessage(`[{"type":"text","text":"Hello "},{"type":"text","text":"world"}]`)
-	if TextContent(raw) != "Hello world" {
-		t.Errorf("got %q", TextContent(raw))
+func TestInputs_TextMarshal(t *testing.T) {
+	inputs := TextInputs("Hello")
+	data, err := json.Marshal(inputs)
+	if err != nil {
+		t.Fatal(err)
 	}
-}
-
-func TestTextContent_Empty(t *testing.T) {
-	if TextContent(nil) != "" {
-		t.Error("expected empty for nil")
-	}
-	if TextContent(json.RawMessage{}) != "" {
-		t.Error("expected empty for empty")
-	}
-}
-
-func TestTextContent_MixedChunks(t *testing.T) {
-	raw := json.RawMessage(`[{"type":"text","text":"Hello"},{"type":"tool_reference","tool":"web_search","title":"Result"},{"type":"text","text":" world"}]`)
-	if TextContent(raw) != "Hello world" {
-		t.Errorf("got %q", TextContent(raw))
+	if string(data) != `"Hello"` {
+		t.Errorf("got %s", data)
 	}
 }

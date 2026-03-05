@@ -20,9 +20,22 @@ func (c *Client) CreateLibrary(ctx context.Context, req *library.CreateRequest) 
 }
 
 // ListLibraries lists all accessible libraries.
-func (c *Client) ListLibraries(ctx context.Context) (*library.ListLibraryOut, error) {
+func (c *Client) ListLibraries(ctx context.Context, params *library.ListLibraryParams) (*library.ListLibraryOut, error) {
+	path := "/v1/libraries"
+	if params != nil {
+		q := url.Values{}
+		if params.Page != nil {
+			q.Set("page", strconv.Itoa(*params.Page))
+		}
+		if params.PageSize != nil {
+			q.Set("page_size", strconv.Itoa(*params.PageSize))
+		}
+		if encoded := q.Encode(); encoded != "" {
+			path += "?" + encoded
+		}
+	}
 	var resp library.ListLibraryOut
-	if err := c.doJSON(ctx, "GET", "/v1/libraries", nil, &resp); err != nil {
+	if err := c.doJSON(ctx, "GET", path, nil, &resp); err != nil {
 		return nil, err
 	}
 	return &resp, nil

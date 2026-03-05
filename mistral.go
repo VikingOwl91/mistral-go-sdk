@@ -5,6 +5,9 @@ import (
 	"time"
 )
 
+// Version is the SDK version string.
+const Version = "0.1.0"
+
 const (
 	defaultBaseURL = "https://api.mistral.ai"
 	defaultTimeout = 120 * time.Second

@@ -3,7 +3,8 @@ package conversation
 import (
 	"encoding/json"
 	"fmt"
-	"strings"
+
+	"somegit.dev/vikingowl/mistral-go-sdk/chat"
 )
 
 // Entry is a sealed interface for conversation history entries.
@@ -13,29 +14,29 @@ type Entry interface {
 
 // MessageInputEntry represents a user or assistant input message.
 type MessageInputEntry struct {
-	Object      string          `json:"object"`
-	ID          string          `json:"id"`
-	Type        string          `json:"type"`
-	CreatedAt   string          `json:"created_at"`
-	CompletedAt *string         `json:"completed_at,omitempty"`
-	Role        string          `json:"role"`
-	Content     json.RawMessage `json:"content"`
-	Prefix      bool            `json:"prefix,omitempty"`
+	Object      string       `json:"object"`
+	ID          string       `json:"id"`
+	Type        string       `json:"type"`
+	CreatedAt   string       `json:"created_at"`
+	CompletedAt *string      `json:"completed_at,omitempty"`
+	Role        string       `json:"role"`
+	Content     chat.Content `json:"content"`
+	Prefix      bool         `json:"prefix,omitempty"`
 }
 
 func (*MessageInputEntry) entryType() string { return "message.input" }
 
 // MessageOutputEntry represents an assistant output message.
 type MessageOutputEntry struct {
-	Object      string          `json:"object"`
-	ID          string          `json:"id"`
-	Type        string          `json:"type"`
-	CreatedAt   string          `json:"created_at"`
-	CompletedAt *string         `json:"completed_at,omitempty"`
-	Role        string          `json:"role"`
-	Content     json.RawMessage `json:"content"`
-	AgentID     *string         `json:"agent_id,omitempty"`
-	Model       *string         `json:"model,omitempty"`
+	Object      string       `json:"object"`
+	ID          string       `json:"id"`
+	Type        string       `json:"type"`
+	CreatedAt   string       `json:"created_at"`
+	CompletedAt *string      `json:"completed_at,omitempty"`
+	Role        string       `json:"role"`
+	Content     chat.Content `json:"content"`
+	AgentID     *string      `json:"agent_id,omitempty"`
+	Model       *string      `json:"model,omitempty"`
 }
 
 func (*MessageOutputEntry) entryType() string { return "message.output" }
@@ -101,6 +102,15 @@ type AgentHandoffEntry struct {
 
 func (*AgentHandoffEntry) entryType() string { return "agent.handoff" }
 
+// UnknownEntry holds an entry with an unrecognized type.
+// This prevents the SDK from breaking when new entry types are added.
+type UnknownEntry struct {
+	Type string
+	Raw  json.RawMessage
+}
+
+func (*UnknownEntry) entryType() string { return "unknown" }
+
 // UnmarshalEntry dispatches JSON to the concrete Entry type
 // based on the "type" discriminator field.
 func UnmarshalEntry(data []byte) (Entry, error) {
@@ -130,32 +140,6 @@ func UnmarshalEntry(data []byte) (Entry, error) {
 		var e AgentHandoffEntry
 		return &e, json.Unmarshal(data, &e)
 	default:
-		return nil, fmt.Errorf("mistral: unknown entry type: %q", probe.Type)
+		return &UnknownEntry{Type: probe.Type, Raw: json.RawMessage(data)}, nil
 	}
-}
-
-// TextContent extracts text from a raw content field.
-// Handles both string content and chunk arrays (extracts text chunks).
-func TextContent(raw json.RawMessage) string {
-	if len(raw) == 0 {
-		return ""
-	}
-	var s string
-	if json.Unmarshal(raw, &s) == nil {
-		return s
-	}
-	var chunks []struct {
-		Type string `json:"type"`
-		Text string `json:"text"`
-	}
-	if json.Unmarshal(raw, &chunks) == nil {
-		var sb strings.Builder
-		for _, ch := range chunks {
-			if ch.Type == "text" {
-				sb.WriteString(ch.Text)
-			}
-		}
-		return sb.String()
-	}
-	return ""
 }

@@ -18,7 +18,7 @@ func (c *Client) AgentsComplete(ctx context.Context, req *agents.CompletionReque
 
 // AgentsCompleteStream sends an agents request and returns a stream of chunks.
 func (c *Client) AgentsCompleteStream(ctx context.Context, req *agents.CompletionRequest) (*Stream[chat.CompletionChunk], error) {
-	req.SetStream(true)
+	req.EnableStream()
 	resp, err := c.doStream(ctx, "POST", "/v1/agents/completions", req)
 	if err != nil {
 		return nil, err

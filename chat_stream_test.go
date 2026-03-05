@@ -110,7 +110,7 @@ func TestChatCompleteStream_CollectContent(t *testing.T) {
 			fmt.Fprintf(w, "data: %s\n\n", data)
 			flusher.Flush()
 		}
-		stop := "stop"
+		stop := chat.FinishReasonStop
 		final := chat.CompletionChunk{
 			ID:    "c",
 			Model: "m",

@@ -19,7 +19,9 @@ type StartRequest struct {
 	stream           bool
 }
 
-func (r *StartRequest) SetStream(v bool) { r.stream = v }
+// EnableStream is used by the mistral package to enable streaming on requests.
+// It is not intended for direct use by consumers.
+func (r *StartRequest) EnableStream() { r.stream = true }
 
 func (r *StartRequest) MarshalJSON() ([]byte, error) {
 	type Alias StartRequest
@@ -42,7 +44,9 @@ type AppendRequest struct {
 	stream            bool
 }
 
-func (r *AppendRequest) SetStream(v bool) { r.stream = v }
+// EnableStream is used by the mistral package to enable streaming on requests.
+// It is not intended for direct use by consumers.
+func (r *AppendRequest) EnableStream() { r.stream = true }
 
 func (r *AppendRequest) MarshalJSON() ([]byte, error) {
 	type Alias AppendRequest
@@ -67,7 +71,9 @@ type RestartRequest struct {
 	stream           bool
 }
 
-func (r *RestartRequest) SetStream(v bool) { r.stream = v }
+// EnableStream is used by the mistral package to enable streaming on requests.
+// It is not intended for direct use by consumers.
+func (r *RestartRequest) EnableStream() { r.stream = true }
 
 func (r *RestartRequest) MarshalJSON() ([]byte, error) {
 	type Alias RestartRequest

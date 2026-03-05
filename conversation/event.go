@@ -172,6 +172,15 @@ func UnmarshalEvent(data []byte) (Event, error) {
 		var e AgentHandoffDoneEvent
 		return &e, json.Unmarshal(data, &e)
 	default:
-		return nil, fmt.Errorf("mistral: unknown event type: %q", probe.Type)
+		return &UnknownEvent{Type: probe.Type, Raw: json.RawMessage(data)}, nil
 	}
 }
+
+// UnknownEvent holds an event with an unrecognized type.
+// This prevents the SDK from breaking when new event types are added.
+type UnknownEvent struct {
+	Type string
+	Raw  json.RawMessage
+}
+
+func (*UnknownEvent) eventType() string { return "unknown" }

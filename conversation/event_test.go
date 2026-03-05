@@ -66,8 +66,10 @@ func TestUnmarshalEvent_MessageOutput(t *testing.T) {
 	if e.ID != "m1" {
 		t.Errorf("got id %q", e.ID)
 	}
-	if TextContent(e.Content) != "Hello" {
-		t.Errorf("got content %q", TextContent(e.Content))
+	var content string
+	json.Unmarshal(e.Content, &content)
+	if content != "Hello" {
+		t.Errorf("got content %q", content)
 	}
 }
 
@@ -145,19 +147,19 @@ func TestUnmarshalEvent_AgentHandoff(t *testing.T) {
 }
 
 func TestUnmarshalEvent_Unknown(t *testing.T) {
-	_, err := UnmarshalEvent([]byte(`{"type":"unknown.event"}`))
-	if err == nil {
-		t.Error("expected error for unknown type")
+	event, err := UnmarshalEvent([]byte(`{"type":"future.event","id":"x"}`))
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	u, ok := event.(*UnknownEvent)
+	if !ok {
+		t.Fatalf("expected *UnknownEvent, got %T", event)
+	}
+	if u.Type != "future.event" {
+		t.Errorf("got type %q", u.Type)
+	}
+	if len(u.Raw) == 0 {
+		t.Error("expected raw data")
 	}
 }
 
-func TestInputs_TextMarshal(t *testing.T) {
-	inputs := TextInputs("Hello")
-	data, err := json.Marshal(inputs)
-	if err != nil {
-		t.Fatal(err)
-	}
-	if string(data) != `"Hello"` {
-		t.Errorf("got %s", data)
-	}
-}

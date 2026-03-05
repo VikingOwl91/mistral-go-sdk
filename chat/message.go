@@ -115,6 +115,21 @@ func UnmarshalMessage(data []byte) (Message, error) {
 		var m ToolMessage
 		return &m, json.Unmarshal(data, &m)
 	default:
-		return nil, fmt.Errorf("mistral: unknown message role: %q", probe.Role)
+		return &UnknownMessage{Role: probe.Role, Raw: json.RawMessage(data)}, nil
 	}
+}
+
+// UnknownMessage holds a message with an unrecognized role.
+// This prevents the SDK from breaking when new roles are added.
+type UnknownMessage struct {
+	Role string
+	Raw  json.RawMessage
+}
+
+func (*UnknownMessage) isMessage() {}
+
+func (m *UnknownMessage) MessageRole() string { return m.Role }
+
+func (m *UnknownMessage) MarshalJSON() ([]byte, error) {
+	return m.Raw, nil
 }

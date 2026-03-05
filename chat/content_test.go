@@ -225,9 +225,24 @@ func TestAudioChunk_RoundTrip(t *testing.T) {
 }
 
 func TestUnmarshalContentChunk_UnknownType(t *testing.T) {
-	_, err := UnmarshalContentChunk([]byte(`{"type":"unknown"}`))
-	if err == nil {
-		t.Error("expected error for unknown type")
+	data := []byte(`{"type":"future_chunk","data":"value"}`)
+	chunk, err := UnmarshalContentChunk(data)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	u, ok := chunk.(*UnknownChunk)
+	if !ok {
+		t.Fatalf("expected *UnknownChunk, got %T", chunk)
+	}
+	if u.Type != "future_chunk" {
+		t.Errorf("got type %q", u.Type)
+	}
+	marshaled, err := json.Marshal(u)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if string(marshaled) != string(data) {
+		t.Errorf("round-trip failed: got %s", marshaled)
 	}
 }
 

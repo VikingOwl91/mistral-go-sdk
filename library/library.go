@@ -38,6 +38,12 @@ type ListLibraryOut struct {
 	Data []Library `json:"data"`
 }
 
+// ListLibraryParams holds optional pagination for listing libraries.
+type ListLibraryParams struct {
+	Page     *int
+	PageSize *int
+}
+
 // Document represents a document in a library.
 type Document struct {
 	ID                           string         `json:"id"`

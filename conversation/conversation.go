@@ -153,6 +153,12 @@ func (h *History) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
+// ListParams holds optional pagination for listing conversations.
+type ListParams struct {
+	Page     *int
+	PageSize *int
+}
+
 // Messages is the response from getting conversation messages.
 type Messages struct {
 	Object         string  `json:"object"`

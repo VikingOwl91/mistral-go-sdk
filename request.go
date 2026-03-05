@@ -85,6 +85,7 @@ func (c *Client) do(ctx context.Context, method, path string, body io.Reader) (*
 		}
 		req.Header.Set("Authorization", "Bearer "+c.apiKey)
 		req.Header.Set("Accept", "application/json")
+		req.Header.Set("User-Agent", "mistral-go-sdk/"+Version)
 		if bodyBytes != nil {
 			req.Header.Set("Content-Type", "application/json")
 		}
@@ -167,6 +168,7 @@ func (c *Client) doMultipart(ctx context.Context, path string, filename string, 
 		req.Header.Set("Authorization", "Bearer "+c.apiKey)
 		req.Header.Set("Accept", "application/json")
 		req.Header.Set("Content-Type", ct)
+		req.Header.Set("User-Agent", "mistral-go-sdk/"+Version)
 		return req, nil
 	})
 	if err != nil {
@@ -214,6 +216,7 @@ func (c *Client) doMultipartStream(ctx context.Context, path string, filename st
 		req.Header.Set("Authorization", "Bearer "+c.apiKey)
 		req.Header.Set("Accept", "text/event-stream")
 		req.Header.Set("Content-Type", ct)
+		req.Header.Set("User-Agent", "mistral-go-sdk/"+Version)
 		return req, nil
 	})
 	if err != nil {

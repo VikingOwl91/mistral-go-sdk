@@ -39,7 +39,7 @@ type CompletionChunk struct {
 type CompletionStreamChoice struct {
 	Index        int          `json:"index"`
 	Delta        DeltaMessage `json:"delta"`
-	FinishReason *string      `json:"finish_reason"`
+	FinishReason *FinishReason `json:"finish_reason"`
 }
 
 // DeltaMessage represents a partial message in a streaming response.

@@ -210,9 +210,24 @@ func TestUnmarshalMessage_Tool(t *testing.T) {
 }
 
 func TestUnmarshalMessage_UnknownRole(t *testing.T) {
-	_, err := UnmarshalMessage([]byte(`{"role":"unknown"}`))
-	if err == nil {
-		t.Error("expected error for unknown role")
+	data := []byte(`{"role":"developer","content":"test"}`)
+	msg, err := UnmarshalMessage(data)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	u, ok := msg.(*UnknownMessage)
+	if !ok {
+		t.Fatalf("expected *UnknownMessage, got %T", msg)
+	}
+	if u.MessageRole() != "developer" {
+		t.Errorf("got role %q", u.MessageRole())
+	}
+	marshaled, err := json.Marshal(u)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if string(marshaled) != string(data) {
+		t.Errorf("round-trip failed: got %s", marshaled)
 	}
 }
 

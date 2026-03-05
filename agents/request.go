@@ -28,8 +28,9 @@ type CompletionRequest struct {
 	stream            bool
 }
 
-// SetStream is used internally to set the stream field.
-func (r *CompletionRequest) SetStream(v bool) { r.stream = v }
+// EnableStream is used by the mistral package to enable streaming on requests.
+// It is not intended for direct use by consumers.
+func (r *CompletionRequest) EnableStream() { r.stream = true }
 
 func (r *CompletionRequest) MarshalJSON() ([]byte, error) {
 	type Alias CompletionRequest
