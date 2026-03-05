@@ -184,6 +184,48 @@ func (c *Client) doMultipart(ctx context.Context, path string, filename string, 
 	return nil
 }
 
+func (c *Client) doMultipartStream(ctx context.Context, path string, filename string, file io.Reader, fields map[string]string) (*http.Response, error) {
+	var buf bytes.Buffer
+	w := multipart.NewWriter(&buf)
+	part, err := w.CreateFormFile("file", filename)
+	if err != nil {
+		return nil, fmt.Errorf("mistral: create form file: %w", err)
+	}
+	if _, err := io.Copy(part, file); err != nil {
+		return nil, fmt.Errorf("mistral: copy file data: %w", err)
+	}
+	for k, v := range fields {
+		if err := w.WriteField(k, v); err != nil {
+			return nil, fmt.Errorf("mistral: write field %s: %w", k, err)
+		}
+	}
+	if err := w.Close(); err != nil {
+		return nil, fmt.Errorf("mistral: close multipart: %w", err)
+	}
+
+	bodyBytes := buf.Bytes()
+	ct := w.FormDataContentType()
+
+	resp, err := c.doRetry(ctx, func() (*http.Request, error) {
+		req, err := http.NewRequestWithContext(ctx, "POST", c.baseURL+path, bytes.NewReader(bodyBytes))
+		if err != nil {
+			return nil, err
+		}
+		req.Header.Set("Authorization", "Bearer "+c.apiKey)
+		req.Header.Set("Accept", "text/event-stream")
+		req.Header.Set("Content-Type", ct)
+		return req, nil
+	})
+	if err != nil {
+		return nil, err
+	}
+	if resp.StatusCode >= 400 {
+		defer resp.Body.Close()
+		return nil, parseAPIError(resp)
+	}
+	return resp, nil
+}
+
 // backoff computes the retry delay with exponential backoff and jitter.
 func (c *Client) backoff(attempt int) time.Duration {
 	if c.retryDelay <= 0 {
