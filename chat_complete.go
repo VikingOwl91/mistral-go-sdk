@@ -14,3 +14,14 @@ func (c *Client) ChatComplete(ctx context.Context, req *chat.CompletionRequest) 
 	}
 	return &resp, nil
 }
+
+// ChatCompleteStream sends a chat completion request and returns a stream
+// of completion chunks. The caller must call Close() on the returned stream.
+func (c *Client) ChatCompleteStream(ctx context.Context, req *chat.CompletionRequest) (*Stream[chat.CompletionChunk], error) {
+	req.SetStream(true)
+	resp, err := c.doStream(ctx, "POST", "/v1/chat/completions", req)
+	if err != nil {
+		return nil, err
+	}
+	return newStream[chat.CompletionChunk](resp.Body), nil
+}
