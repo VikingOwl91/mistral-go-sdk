@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"mime/multipart"
 	"net/http"
 )
 
@@ -69,6 +70,49 @@ func (c *Client) doStream(ctx context.Context, method, path string, reqBody any)
 		return nil, parseAPIError(resp)
 	}
 	return resp, nil
+}
+
+func (c *Client) doMultipart(ctx context.Context, path string, filename string, file io.Reader, fields map[string]string, respBody any) error {
+	var buf bytes.Buffer
+	w := multipart.NewWriter(&buf)
+	part, err := w.CreateFormFile("file", filename)
+	if err != nil {
+		return fmt.Errorf("mistral: create form file: %w", err)
+	}
+	if _, err := io.Copy(part, file); err != nil {
+		return fmt.Errorf("mistral: copy file data: %w", err)
+	}
+	for k, v := range fields {
+		if err := w.WriteField(k, v); err != nil {
+			return fmt.Errorf("mistral: write field %s: %w", k, err)
+		}
+	}
+	if err := w.Close(); err != nil {
+		return fmt.Errorf("mistral: close multipart: %w", err)
+	}
+
+	req, err := http.NewRequestWithContext(ctx, "POST", c.baseURL+path, &buf)
+	if err != nil {
+		return fmt.Errorf("mistral: create request: %w", err)
+	}
+	req.Header.Set("Authorization", "Bearer "+c.apiKey)
+	req.Header.Set("Accept", "application/json")
+	req.Header.Set("Content-Type", w.FormDataContentType())
+
+	resp, err := c.httpClient.Do(req)
+	if err != nil {
+		return fmt.Errorf("mistral: send request: %w", err)
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode >= 400 {
+		return parseAPIError(resp)
+	}
+	if respBody != nil {
+		if err := json.NewDecoder(resp.Body).Decode(respBody); err != nil {
+			return fmt.Errorf("mistral: decode response: %w", err)
+		}
+	}
+	return nil
 }
 
 func parseAPIError(resp *http.Response) error {
