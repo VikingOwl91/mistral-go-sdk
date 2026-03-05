@@ -18,7 +18,7 @@ func (c *Client) FIMComplete(ctx context.Context, req *fim.CompletionRequest) (*
 
 // FIMCompleteStream sends a FIM request and returns a stream of chunks.
 func (c *Client) FIMCompleteStream(ctx context.Context, req *fim.CompletionRequest) (*Stream[chat.CompletionChunk], error) {
-	req.SetStream(true)
+	req.EnableStream()
 	resp, err := c.doStream(ctx, "POST", "/v1/fim/completions", req)
 	if err != nil {
 		return nil, err

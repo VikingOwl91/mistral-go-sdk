@@ -61,8 +61,8 @@ func TestStartConversation_Success(t *testing.T) {
 	if !ok {
 		t.Fatalf("expected *MessageOutputEntry, got %T", resp.Outputs[0])
 	}
-	if conversation.TextContent(out.Content) != "Hello! How can I help?" {
-		t.Errorf("got %q", conversation.TextContent(out.Content))
+	if out.Content.String() != "Hello! How can I help?" {
+		t.Errorf("got %q", out.Content.String())
 	}
 	if resp.Usage.TotalTokens != 18 {
 		t.Errorf("got total_tokens %d", resp.Usage.TotalTokens)
@@ -235,8 +235,10 @@ func TestStartConversationStream_Success(t *testing.T) {
 	if !ok {
 		t.Fatalf("expected *MessageOutputEvent, got %T", events[1])
 	}
-	if conversation.TextContent(msg.Content) != "Hello" {
-		t.Errorf("got %q", conversation.TextContent(msg.Content))
+	var msgText string
+	json.Unmarshal(msg.Content, &msgText)
+	if msgText != "Hello" {
+		t.Errorf("got %q", msgText)
 	}
 
 	done, ok := events[3].(*conversation.ResponseDoneEvent)

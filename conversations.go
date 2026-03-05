@@ -4,6 +4,8 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"net/url"
+	"strconv"
 
 	"somegit.dev/vikingowl/mistral-go-sdk/conversation"
 )
@@ -19,7 +21,7 @@ func (c *Client) StartConversation(ctx context.Context, req *conversation.StartR
 
 // StartConversationStream creates a conversation and returns a stream of events.
 func (c *Client) StartConversationStream(ctx context.Context, req *conversation.StartRequest) (*EventStream, error) {
-	req.SetStream(true)
+	req.EnableStream()
 	resp, err := c.doStream(ctx, "POST", "/v1/conversations", req)
 	if err != nil {
 		return nil, err
@@ -38,7 +40,7 @@ func (c *Client) AppendConversation(ctx context.Context, conversationID string, 
 
 // AppendConversationStream appends to a conversation and returns a stream of events.
 func (c *Client) AppendConversationStream(ctx context.Context, conversationID string, req *conversation.AppendRequest) (*EventStream, error) {
-	req.SetStream(true)
+	req.EnableStream()
 	resp, err := c.doStream(ctx, "POST", fmt.Sprintf("/v1/conversations/%s", conversationID), req)
 	if err != nil {
 		return nil, err
@@ -57,7 +59,7 @@ func (c *Client) RestartConversation(ctx context.Context, conversationID string,
 
 // RestartConversationStream restarts a conversation and returns a stream of events.
 func (c *Client) RestartConversationStream(ctx context.Context, conversationID string, req *conversation.RestartRequest) (*EventStream, error) {
-	req.SetStream(true)
+	req.EnableStream()
 	resp, err := c.doStream(ctx, "POST", fmt.Sprintf("/v1/conversations/%s/restart", conversationID), req)
 	if err != nil {
 		return nil, err
@@ -75,9 +77,22 @@ func (c *Client) GetConversation(ctx context.Context, conversationID string) (*c
 }
 
 // ListConversations lists conversations with optional pagination.
-func (c *Client) ListConversations(ctx context.Context) ([]conversation.Conversation, error) {
+func (c *Client) ListConversations(ctx context.Context, params *conversation.ListParams) ([]conversation.Conversation, error) {
+	path := "/v1/conversations"
+	if params != nil {
+		q := url.Values{}
+		if params.Page != nil {
+			q.Set("page", strconv.Itoa(*params.Page))
+		}
+		if params.PageSize != nil {
+			q.Set("page_size", strconv.Itoa(*params.PageSize))
+		}
+		if encoded := q.Encode(); encoded != "" {
+			path += "?" + encoded
+		}
+	}
 	var resp []conversation.Conversation
-	if err := c.doJSON(ctx, "GET", "/v1/conversations", nil, &resp); err != nil {
+	if err := c.doJSON(ctx, "GET", path, nil, &resp); err != nil {
 		return nil, err
 	}
 	return resp, nil

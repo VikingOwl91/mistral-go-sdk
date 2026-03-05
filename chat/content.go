@@ -224,8 +224,21 @@ func UnmarshalContentChunk(data []byte) (ContentChunk, error) {
 		var c AudioChunk
 		return &c, json.Unmarshal(data, &c)
 	default:
-		return nil, fmt.Errorf("mistral: unknown content chunk type: %q", probe.Type)
+		return &UnknownChunk{Type: probe.Type, Raw: json.RawMessage(data)}, nil
 	}
+}
+
+// UnknownChunk holds a content chunk with an unrecognized type.
+// This prevents the SDK from breaking when new chunk types are added.
+type UnknownChunk struct {
+	Type string
+	Raw  json.RawMessage
+}
+
+func (*UnknownChunk) contentChunk() {}
+
+func (c *UnknownChunk) MarshalJSON() ([]byte, error) {
+	return c.Raw, nil
 }
 
 // Content represents a message content field that can be a string,
