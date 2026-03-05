@@ -51,6 +51,26 @@ func (c *Client) doJSON(ctx context.Context, method, path string, reqBody, respB
 	return nil
 }
 
+func (c *Client) doStream(ctx context.Context, method, path string, reqBody any) (*http.Response, error) {
+	var body io.Reader
+	if reqBody != nil {
+		data, err := json.Marshal(reqBody)
+		if err != nil {
+			return nil, fmt.Errorf("mistral: marshal request: %w", err)
+		}
+		body = bytes.NewReader(data)
+	}
+	resp, err := c.do(ctx, method, path, body)
+	if err != nil {
+		return nil, err
+	}
+	if resp.StatusCode >= 400 {
+		defer resp.Body.Close()
+		return nil, parseAPIError(resp)
+	}
+	return resp, nil
+}
+
 func parseAPIError(resp *http.Response) error {
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
