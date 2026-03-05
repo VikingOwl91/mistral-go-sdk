@@ -1,10 +1,24 @@
 # mistral-go-sdk
 
-An idiomatic Go client for the [Mistral AI API](https://docs.mistral.ai/).
+The most complete Go client for the [Mistral AI API](https://docs.mistral.ai/).
 
 <!-- Badges -->
 ![Go Version](https://img.shields.io/badge/go-1.26-blue)
 ![License](https://img.shields.io/badge/license-MIT-green)
+
+## Why This SDK?
+
+**Zero dependencies.** The entire SDK — including tests — uses only the Go standard library. No `go.sum`, no transitive dependency tree to audit, no version conflicts, no supply chain risk.
+
+**Full API coverage.** 75 methods across every Mistral endpoint — including Conversations, Agents CRUD, Libraries, OCR, Audio, Fine-tuning, and Batch Jobs. No other Go SDK covers Conversations or Agents.
+
+**Typed streaming.** A generic pull-based `Stream[T]` iterator — no channels, no goroutines, no leaks. Just `Next()` / `Current()` / `Err()` / `Close()`.
+
+**Forward-compatible.** Unknown types (`UnknownEntry`, `UnknownEvent`, `UnknownMessage`, `UnknownChunk`, `UnknownAgentTool`) capture raw JSON instead of returning errors. When Mistral ships a new message role or event type, your code keeps running — it doesn't panic.
+
+**Hand-written, not generated.** Idiomatic Go with sealed interfaces, discriminated unions, and functional options — not a Speakeasy/OpenAPI auto-gen dump with `any` everywhere.
+
+**Test-driven.** 126 tests with race detection clean. Every endpoint tested against mock servers; integration tests against the real API.
 
 ## Install
 
@@ -136,6 +150,28 @@ for stream.Next() {
 | **Libraries** | `CreateLibrary`, `ListLibraries`, `GetLibrary`, `UpdateLibrary`, `DeleteLibrary`, `UploadDocument`, `ListDocuments`, `GetDocument`, `UpdateDocument`, `DeleteDocument`, `GetDocumentTextContent`, `GetDocumentStatus`, `GetDocumentSignedURL`, `GetDocumentExtractedTextSignedURL`, `ReprocessDocument`, `ListLibrarySharing`, `ShareLibrary`, `UnshareLibrary` |
 | **Moderation** | `Moderate`, `ModerateChat` |
 | **Classification** | `Classify`, `ClassifyChat` |
+
+## Comparison
+
+There is no official Go SDK from Mistral AI (only Python and TypeScript). The main community options:
+
+| Feature | mistral-go-sdk | [Gage-Technologies](https://github.com/Gage-Technologies/mistral-go) | [robertjkeck2](https://github.com/robertjkeck2/mistral-go) | [AuxData-ai](https://github.com/AuxData-ai/mistral-go) |
+|---------|:-:|:-:|:-:|:-:|
+| Chat / Streaming | Yes | Yes | Yes | Yes |
+| FIM | Yes | Yes | No | Yes |
+| Embeddings | Yes | Yes | Yes | Yes |
+| Tool calling | Yes | No | No | No |
+| Agents (completions + CRUD) | Yes | No | No | No |
+| Conversations API | Yes | No | No | No |
+| Libraries / Documents | Yes | No | No | No |
+| Fine-tuning / Batch | Yes | No | No | No |
+| OCR | Yes | No | No | Yes |
+| Audio transcription | Yes | No | No | No |
+| Moderation / Classification | Yes | No | No | No |
+| Vision (multimodal) | Yes | No | No | Yes |
+| Zero dependencies | Yes | test-only (testify) | test-only (testify) | test-only (testify) |
+| Forward-compatible types | Yes | No | No | No |
+| Last updated | 2026 | Jun 2024 | Jan 2024 | ~2025 (fork of Gage) |
 
 ## Configuration
 
