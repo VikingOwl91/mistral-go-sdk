@@ -1,3 +1,11 @@
+## v1.0.0 — 2026-03-17
+
+Stable release. Tracks upstream Python SDK v2.0.4.
+
+No API changes from v0.2.0. This release signals that the SDK surface is
+stable and follows Go module semver conventions — breaking changes will only
+occur in future major versions.
+
 ## v0.2.0 — 2026-03-17
 
 Sync with upstream Python SDK v2.0.4. Upstream reference changed from OpenAPI
