@@ -219,6 +219,10 @@ if err != nil {
 This SDK tracks the [official Mistral Python SDK](https://github.com/mistralai/client-python)
 as its upstream reference for API surface and type definitions.
 
+| SDK Version | Upstream Python SDK |
+|-------------|---------------------|
+| v1.0.0 | v2.0.4 |
+
 ## License
 
 [MIT](LICENSE)
