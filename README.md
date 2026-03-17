@@ -3,6 +3,7 @@
 The most complete Go client for the [Mistral AI API](https://docs.mistral.ai/).
 
 <!-- Badges -->
+[![Go Reference](https://pkg.go.dev/badge/somegit.dev/vikingowl/mistral-go-sdk.svg)](https://pkg.go.dev/somegit.dev/vikingowl/mistral-go-sdk)
 ![Go Version](https://img.shields.io/badge/go-1.26-blue)
 ![License](https://img.shields.io/badge/license-MIT-green)
 
