@@ -23,8 +23,9 @@ type CompletionRequest struct {
 	N                 *int                 `json:"n,omitempty"`
 	ParallelToolCalls *bool                `json:"parallel_tool_calls,omitempty"`
 	Metadata          map[string]any       `json:"metadata,omitempty"`
-	Prediction        *chat.Prediction     `json:"prediction,omitempty"`
-	PromptMode        *chat.PromptMode     `json:"prompt_mode,omitempty"`
+	Prediction        *chat.Prediction       `json:"prediction,omitempty"`
+	PromptMode        *chat.PromptMode       `json:"prompt_mode,omitempty"`
+	Guardrails        []chat.GuardrailConfig `json:"guardrails,omitempty"`
 	stream            bool
 }
 

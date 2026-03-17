@@ -1,6 +1,10 @@
 package conversation
 
-import "encoding/json"
+import (
+	"encoding/json"
+
+	"somegit.dev/vikingowl/mistral-go-sdk/chat"
+)
 
 // StartRequest starts a new conversation.
 type StartRequest struct {
@@ -11,9 +15,10 @@ type StartRequest struct {
 	Instructions     *string          `json:"instructions,omitempty"`
 	Tools            []Tool           `json:"tools,omitempty"`
 	CompletionArgs   *CompletionArgs  `json:"completion_args,omitempty"`
-	Store            *bool            `json:"store,omitempty"`
-	HandoffExecution *HandoffExecution `json:"handoff_execution,omitempty"`
-	Name             *string          `json:"name,omitempty"`
+	Store            *bool                  `json:"store,omitempty"`
+	HandoffExecution *HandoffExecution      `json:"handoff_execution,omitempty"`
+	Guardrails       []chat.GuardrailConfig `json:"guardrails,omitempty"`
+	Name             *string                `json:"name,omitempty"`
 	Description      *string          `json:"description,omitempty"`
 	Metadata         map[string]any   `json:"metadata,omitempty"`
 	stream           bool
@@ -61,13 +66,14 @@ func (r *AppendRequest) MarshalJSON() ([]byte, error) {
 
 // RestartRequest restarts a conversation from a specific entry.
 type RestartRequest struct {
-	Inputs           Inputs           `json:"inputs"`
-	FromEntryID      string           `json:"from_entry_id"`
-	CompletionArgs   *CompletionArgs  `json:"completion_args,omitempty"`
-	Store            *bool            `json:"store,omitempty"`
-	HandoffExecution *HandoffExecution `json:"handoff_execution,omitempty"`
-	AgentVersion     json.RawMessage  `json:"agent_version,omitempty"`
-	Metadata         map[string]any   `json:"metadata,omitempty"`
+	Inputs           Inputs                 `json:"inputs"`
+	FromEntryID      string                 `json:"from_entry_id"`
+	CompletionArgs   *CompletionArgs        `json:"completion_args,omitempty"`
+	Store            *bool                  `json:"store,omitempty"`
+	HandoffExecution *HandoffExecution      `json:"handoff_execution,omitempty"`
+	Guardrails       []chat.GuardrailConfig `json:"guardrails,omitempty"`
+	AgentVersion     json.RawMessage        `json:"agent_version,omitempty"`
+	Metadata         map[string]any         `json:"metadata,omitempty"`
 	stream           bool
 }
 

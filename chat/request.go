@@ -30,11 +30,12 @@ type CompletionRequest struct {
 	PresencePenalty   *float64        `json:"presence_penalty,omitempty"`
 	FrequencyPenalty  *float64        `json:"frequency_penalty,omitempty"`
 	N                 *int            `json:"n,omitempty"`
-	SafePrompt        bool            `json:"safe_prompt,omitempty"`
-	ParallelToolCalls *bool           `json:"parallel_tool_calls,omitempty"`
-	Metadata          map[string]any  `json:"metadata,omitempty"`
-	Prediction        *Prediction     `json:"prediction,omitempty"`
-	PromptMode        *PromptMode     `json:"prompt_mode,omitempty"`
+	SafePrompt        bool              `json:"safe_prompt,omitempty"`
+	ParallelToolCalls *bool             `json:"parallel_tool_calls,omitempty"`
+	Metadata          map[string]any    `json:"metadata,omitempty"`
+	Prediction        *Prediction       `json:"prediction,omitempty"`
+	PromptMode        *PromptMode       `json:"prompt_mode,omitempty"`
+	Guardrails        []GuardrailConfig `json:"guardrails,omitempty"`
 	stream            bool
 }
 

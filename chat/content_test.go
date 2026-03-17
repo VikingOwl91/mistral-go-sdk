@@ -150,11 +150,15 @@ func TestFileChunk_RoundTrip(t *testing.T) {
 	}
 }
 
-func TestReferenceChunk_RoundTrip(t *testing.T) {
-	original := &ReferenceChunk{ReferenceIDs: []int{1, 2, 3}}
+func TestReferenceChunk_RoundTrip_IntIDs(t *testing.T) {
+	original := &ReferenceChunk{ReferenceIDs: []ReferenceID{IntRef(1), IntRef(2), IntRef(3)}}
 	data, err := json.Marshal(original)
 	if err != nil {
 		t.Fatal(err)
+	}
+	want := `{"type":"reference","reference_ids":[1,2,3]}`
+	if string(data) != want {
+		t.Errorf("marshal: got %s, want %s", data, want)
 	}
 	chunk, err := UnmarshalContentChunk(data)
 	if err != nil {
@@ -164,8 +168,64 @@ func TestReferenceChunk_RoundTrip(t *testing.T) {
 	if !ok {
 		t.Fatalf("expected *ReferenceChunk, got %T", chunk)
 	}
-	if len(rc.ReferenceIDs) != 3 || rc.ReferenceIDs[0] != 1 {
-		t.Errorf("got %v, want [1 2 3]", rc.ReferenceIDs)
+	if len(rc.ReferenceIDs) != 3 {
+		t.Fatalf("got %d IDs, want 3", len(rc.ReferenceIDs))
+	}
+	n, ok := rc.ReferenceIDs[0].Int()
+	if !ok || n != 1 {
+		t.Errorf("got %v (ok=%v), want 1", n, ok)
+	}
+}
+
+func TestReferenceChunk_RoundTrip_MixedIDs(t *testing.T) {
+	data := []byte(`{"type":"reference","reference_ids":[1,"abc",42]}`)
+	chunk, err := UnmarshalContentChunk(data)
+	if err != nil {
+		t.Fatal(err)
+	}
+	rc, ok := chunk.(*ReferenceChunk)
+	if !ok {
+		t.Fatalf("expected *ReferenceChunk, got %T", chunk)
+	}
+	if len(rc.ReferenceIDs) != 3 {
+		t.Fatalf("got %d IDs, want 3", len(rc.ReferenceIDs))
+	}
+	// First: int 1
+	if n, ok := rc.ReferenceIDs[0].Int(); !ok || n != 1 {
+		t.Errorf("IDs[0]: got %v (ok=%v), want int 1", n, ok)
+	}
+	// Second: string "abc"
+	if !rc.ReferenceIDs[1].IsString() || rc.ReferenceIDs[1].String() != "abc" {
+		t.Errorf("IDs[1]: got %q (isString=%v), want string abc", rc.ReferenceIDs[1].String(), rc.ReferenceIDs[1].IsString())
+	}
+	// Third: int 42
+	if n, ok := rc.ReferenceIDs[2].Int(); !ok || n != 42 {
+		t.Errorf("IDs[2]: got %v (ok=%v), want int 42", n, ok)
+	}
+	// Round-trip preserves types
+	out, err := json.Marshal(rc)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if string(out) != `{"type":"reference","reference_ids":[1,"abc",42]}` {
+		t.Errorf("round-trip: got %s", out)
+	}
+}
+
+func TestReferenceID_StringRef(t *testing.T) {
+	id := StringRef("doc-123")
+	if !id.IsString() {
+		t.Error("expected IsString=true")
+	}
+	if id.String() != "doc-123" {
+		t.Errorf("got %q", id.String())
+	}
+	if _, ok := id.Int(); ok {
+		t.Error("Int() should return false for string ref")
+	}
+	data, _ := json.Marshal(id)
+	if string(data) != `"doc-123"` {
+		t.Errorf("marshal: got %s", data)
 	}
 }
 
@@ -174,7 +234,7 @@ func TestThinkChunk_RoundTrip(t *testing.T) {
 	original := &ThinkChunk{
 		Thinking: []ContentChunk{
 			&TextChunk{Text: "reasoning step"},
-			&ReferenceChunk{ReferenceIDs: []int{42}},
+			&ReferenceChunk{ReferenceIDs: []ReferenceID{IntRef(42)}},
 		},
 		Closed: &closed,
 	}
@@ -363,5 +423,78 @@ func TestContent_IsNull(t *testing.T) {
 	}
 	if ChunksContent(&TextChunk{Text: "x"}).IsNull() {
 		t.Error("chunks content should not be null")
+	}
+}
+
+func TestToolReferenceChunk_RoundTrip(t *testing.T) {
+	url := "https://example.com/result"
+	desc := "A search result"
+	original := &ToolReferenceChunk{
+		Tool:        string(ConnectorWebSearch),
+		Title:       "Example Result",
+		URL:         &url,
+		Description: &desc,
+	}
+	data, err := json.Marshal(original)
+	if err != nil {
+		t.Fatal(err)
+	}
+	chunk, err := UnmarshalContentChunk(data)
+	if err != nil {
+		t.Fatal(err)
+	}
+	tr, ok := chunk.(*ToolReferenceChunk)
+	if !ok {
+		t.Fatalf("expected *ToolReferenceChunk, got %T", chunk)
+	}
+	if tr.Tool != "web_search" {
+		t.Errorf("got tool %q, want web_search", tr.Tool)
+	}
+	if tr.Title != "Example Result" {
+		t.Errorf("got title %q", tr.Title)
+	}
+	if tr.URL == nil || *tr.URL != url {
+		t.Errorf("got url %v, want %q", tr.URL, url)
+	}
+	if tr.Description == nil || *tr.Description != desc {
+		t.Errorf("got description %v, want %q", tr.Description, desc)
+	}
+	if tr.Favicon != nil {
+		t.Errorf("expected nil favicon, got %v", tr.Favicon)
+	}
+}
+
+func TestToolFileChunk_RoundTrip(t *testing.T) {
+	fname := "output.csv"
+	ftype := "text/csv"
+	original := &ToolFileChunk{
+		Tool:     string(ConnectorCodeInterpreter),
+		FileID:   "file-abc123",
+		FileName: &fname,
+		FileType: &ftype,
+	}
+	data, err := json.Marshal(original)
+	if err != nil {
+		t.Fatal(err)
+	}
+	chunk, err := UnmarshalContentChunk(data)
+	if err != nil {
+		t.Fatal(err)
+	}
+	tf, ok := chunk.(*ToolFileChunk)
+	if !ok {
+		t.Fatalf("expected *ToolFileChunk, got %T", chunk)
+	}
+	if tf.Tool != "code_interpreter" {
+		t.Errorf("got tool %q", tf.Tool)
+	}
+	if tf.FileID != "file-abc123" {
+		t.Errorf("got file_id %q", tf.FileID)
+	}
+	if tf.FileName == nil || *tf.FileName != fname {
+		t.Errorf("got file_name %v", tf.FileName)
+	}
+	if tf.FileType == nil || *tf.FileType != ftype {
+		t.Errorf("got file_type %v", tf.FileType)
 	}
 }

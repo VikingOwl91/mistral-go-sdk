@@ -3,6 +3,8 @@ package agents
 import (
 	"encoding/json"
 	"fmt"
+
+	"somegit.dev/vikingowl/mistral-go-sdk/chat"
 )
 
 // AgentTool is a sealed interface for agent tool types.
@@ -59,6 +61,22 @@ type DocumentLibraryTool struct {
 
 func (*DocumentLibraryTool) agentToolType() string { return "document_library" }
 
+// ConnectorAuth holds authorization for a custom connector.
+type ConnectorAuth struct {
+	Type  string `json:"type"`
+	Value string `json:"value"`
+}
+
+// ConnectorTool represents a custom connector tool.
+type ConnectorTool struct {
+	Type              string             `json:"type"`
+	ConnectorID       string             `json:"connector_id"`
+	Authorization     *ConnectorAuth     `json:"authorization,omitempty"`
+	ToolConfiguration *ToolConfiguration `json:"tool_configuration,omitempty"`
+}
+
+func (*ConnectorTool) agentToolType() string { return "connector" }
+
 // UnknownAgentTool holds an unrecognized tool type.
 type UnknownAgentTool struct {
 	Type string
@@ -98,6 +116,9 @@ func UnmarshalAgentTool(data []byte) (AgentTool, error) {
 		return &t, json.Unmarshal(data, &t)
 	case "document_library":
 		var t DocumentLibraryTool
+		return &t, json.Unmarshal(data, &t)
+	case "connector":
+		var t ConnectorTool
 		return &t, json.Unmarshal(data, &t)
 	default:
 		return &UnknownAgentTool{Type: probe.Type, Raw: json.RawMessage(data)}, nil
@@ -151,7 +172,7 @@ type Agent struct {
 	Description    *string           `json:"description,omitempty"`
 	Tools          AgentTools        `json:"tools,omitempty"`
 	CompletionArgs *CompletionArgs   `json:"completion_args,omitempty"`
-	Guardrails     []GuardrailConfig `json:"guardrails,omitempty"`
+	Guardrails     []chat.GuardrailConfig `json:"guardrails,omitempty"`
 	Handoffs       []string          `json:"handoffs,omitempty"`
 	Metadata       map[string]any    `json:"metadata,omitempty"`
 	VersionMessage *string           `json:"version_message,omitempty"`
@@ -165,7 +186,7 @@ type CreateRequest struct {
 	Description    *string           `json:"description,omitempty"`
 	Tools          AgentTools        `json:"tools,omitempty"`
 	CompletionArgs *CompletionArgs   `json:"completion_args,omitempty"`
-	Guardrails     []GuardrailConfig `json:"guardrails,omitempty"`
+	Guardrails     []chat.GuardrailConfig `json:"guardrails,omitempty"`
 	Handoffs       []string          `json:"handoffs,omitempty"`
 	Metadata       map[string]any    `json:"metadata,omitempty"`
 	VersionMessage *string           `json:"version_message,omitempty"`
@@ -179,7 +200,7 @@ type UpdateRequest struct {
 	Description    *string           `json:"description,omitempty"`
 	Tools          AgentTools        `json:"tools,omitempty"`
 	CompletionArgs *CompletionArgs   `json:"completion_args,omitempty"`
-	Guardrails     []GuardrailConfig `json:"guardrails,omitempty"`
+	Guardrails     []chat.GuardrailConfig `json:"guardrails,omitempty"`
 	Handoffs       []string          `json:"handoffs,omitempty"`
 	DeploymentChat *bool             `json:"deployment_chat,omitempty"`
 	Metadata       map[string]any    `json:"metadata,omitempty"`
@@ -221,20 +242,6 @@ type CompletionArgs struct {
 	RandomSeed       *int            `json:"random_seed,omitempty"`
 	ResponseFormat   json.RawMessage `json:"response_format,omitempty"`
 	ToolChoice       *string         `json:"tool_choice,omitempty"`
-}
-
-// GuardrailConfig configures moderation guardrails for an agent.
-type GuardrailConfig struct {
-	BlockOnError    bool                   `json:"block_on_error"`
-	ModerationLLMV1 *ModerationLLMV1Config `json:"moderation_llm_v1"`
-}
-
-// ModerationLLMV1Config configures the moderation LLM guardrail.
-type ModerationLLMV1Config struct {
-	ModelName                string          `json:"model_name,omitempty"`
-	CustomCategoryThresholds json.RawMessage `json:"custom_category_thresholds,omitempty"`
-	IgnoreOtherCategories    bool            `json:"ignore_other_categories,omitempty"`
-	Action                   string          `json:"action,omitempty"`
 }
 
 // ToolConfiguration holds include/exclude/confirmation lists for tools.
