@@ -34,8 +34,10 @@ type ModelCapabilities struct {
 	OCR                bool `json:"ocr"`
 	Classification     bool `json:"classification"`
 	Moderation         bool `json:"moderation"`
-	Audio              bool `json:"audio"`
-	AudioTranscription bool `json:"audio_transcription"`
+	Audio                      bool `json:"audio"`
+	AudioTranscription         bool `json:"audio_transcription"`
+	AudioTranscriptionRealtime bool `json:"audio_transcription_realtime"`
+	AudioSpeech                bool `json:"audio_speech"`
 }
 
 // ModelList is the response from listing models.

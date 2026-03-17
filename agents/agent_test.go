@@ -66,6 +66,30 @@ func TestAgentTools_RoundTrip(t *testing.T) {
 	}
 }
 
+func TestUnmarshalAgentTool_Connector(t *testing.T) {
+	data := []byte(`{"type":"connector","connector_id":"my-connector","authorization":{"type":"api-key","value":"sk-test"}}`)
+	tool, err := UnmarshalAgentTool(data)
+	if err != nil {
+		t.Fatal(err)
+	}
+	ct, ok := tool.(*ConnectorTool)
+	if !ok {
+		t.Fatalf("expected *ConnectorTool, got %T", tool)
+	}
+	if ct.ConnectorID != "my-connector" {
+		t.Errorf("got connector_id %q", ct.ConnectorID)
+	}
+	if ct.Authorization == nil {
+		t.Fatal("expected authorization")
+	}
+	if ct.Authorization.Type != "api-key" {
+		t.Errorf("got auth type %q", ct.Authorization.Type)
+	}
+	if ct.Authorization.Value != "sk-test" {
+		t.Errorf("got auth value %q", ct.Authorization.Value)
+	}
+}
+
 func TestAgent_UnmarshalWithTools(t *testing.T) {
 	data := []byte(`{
 		"id":"ag-1","object":"agent","name":"A","model":"m",

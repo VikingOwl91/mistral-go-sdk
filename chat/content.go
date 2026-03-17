@@ -3,6 +3,18 @@ package chat
 import (
 	"encoding/json"
 	"fmt"
+	"strconv"
+)
+
+// BuiltInConnector identifies a built-in connector type.
+type BuiltInConnector string
+
+const (
+	ConnectorWebSearch        BuiltInConnector = "web_search"
+	ConnectorWebSearchPremium BuiltInConnector = "web_search_premium"
+	ConnectorCodeInterpreter  BuiltInConnector = "code_interpreter"
+	ConnectorImageGeneration  BuiltInConnector = "image_generation"
+	ConnectorDocumentLibrary  BuiltInConnector = "document_library"
 )
 
 // ContentChunk is a sealed interface for message content parts.
@@ -112,9 +124,65 @@ func (c *FileChunk) MarshalJSON() ([]byte, error) {
 	})
 }
 
+// ReferenceID is a reference identifier that can be an integer or string.
+// Use [IntRef] or [StringRef] constructors.
+type ReferenceID struct {
+	raw      string
+	isString bool
+}
+
+// IntRef creates an integer reference ID.
+func IntRef(n int) ReferenceID {
+	return ReferenceID{raw: strconv.Itoa(n)}
+}
+
+// StringRef creates a string reference ID.
+func StringRef(s string) ReferenceID {
+	return ReferenceID{raw: s, isString: true}
+}
+
+// String returns the string representation.
+func (id ReferenceID) String() string { return id.raw }
+
+// Int returns the integer value and true if this is a numeric reference.
+func (id ReferenceID) Int() (int, bool) {
+	if id.isString {
+		return 0, false
+	}
+	n, err := strconv.Atoi(id.raw)
+	return n, err == nil
+}
+
+// IsString reports whether this is a string reference.
+func (id ReferenceID) IsString() bool { return id.isString }
+
+func (id ReferenceID) MarshalJSON() ([]byte, error) {
+	if id.isString {
+		return json.Marshal(id.raw)
+	}
+	return []byte(id.raw), nil
+}
+
+func (id *ReferenceID) UnmarshalJSON(data []byte) error {
+	if len(data) == 0 {
+		return nil
+	}
+	if data[0] == '"' {
+		var s string
+		if err := json.Unmarshal(data, &s); err != nil {
+			return err
+		}
+		id.raw = s
+		id.isString = true
+		return nil
+	}
+	id.raw = string(data)
+	return nil
+}
+
 // ReferenceChunk represents a reference content part.
 type ReferenceChunk struct {
-	ReferenceIDs []int `json:"reference_ids"`
+	ReferenceIDs []ReferenceID `json:"reference_ids"`
 }
 
 func (*ReferenceChunk) contentChunk() {}
@@ -192,6 +260,49 @@ func (c *AudioChunk) MarshalJSON() ([]byte, error) {
 	})
 }
 
+// ToolReferenceChunk represents a tool reference content part.
+type ToolReferenceChunk struct {
+	Tool        string  `json:"tool"`
+	Title       string  `json:"title"`
+	URL         *string `json:"url,omitempty"`
+	Favicon     *string `json:"favicon,omitempty"`
+	Description *string `json:"description,omitempty"`
+}
+
+func (*ToolReferenceChunk) contentChunk() {}
+
+func (c *ToolReferenceChunk) MarshalJSON() ([]byte, error) {
+	type alias ToolReferenceChunk
+	return json.Marshal(&struct {
+		Type string `json:"type"`
+		*alias
+	}{
+		Type:  "tool_reference",
+		alias: (*alias)(c),
+	})
+}
+
+// ToolFileChunk represents a tool-generated file content part.
+type ToolFileChunk struct {
+	Tool     string  `json:"tool"`
+	FileID   string  `json:"file_id"`
+	FileName *string `json:"file_name,omitempty"`
+	FileType *string `json:"file_type,omitempty"`
+}
+
+func (*ToolFileChunk) contentChunk() {}
+
+func (c *ToolFileChunk) MarshalJSON() ([]byte, error) {
+	type alias ToolFileChunk
+	return json.Marshal(&struct {
+		Type string `json:"type"`
+		*alias
+	}{
+		Type:  "tool_file",
+		alias: (*alias)(c),
+	})
+}
+
 // UnmarshalContentChunk dispatches to the concrete ContentChunk type
 // based on the "type" discriminator field.
 func UnmarshalContentChunk(data []byte) (ContentChunk, error) {
@@ -222,6 +333,12 @@ func UnmarshalContentChunk(data []byte) (ContentChunk, error) {
 		return &c, json.Unmarshal(data, &c)
 	case "input_audio":
 		var c AudioChunk
+		return &c, json.Unmarshal(data, &c)
+	case "tool_reference":
+		var c ToolReferenceChunk
+		return &c, json.Unmarshal(data, &c)
+	case "tool_file":
+		var c ToolFileChunk
 		return &c, json.Unmarshal(data, &c)
 	default:
 		return &UnknownChunk{Type: probe.Type, Raw: json.RawMessage(data)}, nil

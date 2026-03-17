@@ -18,7 +18,7 @@ The most complete Go client for the [Mistral AI API](https://docs.mistral.ai/).
 
 **Hand-written, not generated.** Idiomatic Go with sealed interfaces, discriminated unions, and functional options — not a Speakeasy/OpenAPI auto-gen dump with `any` everywhere.
 
-**Test-driven.** 126 tests with race detection clean. Every endpoint tested against mock servers; integration tests against the real API.
+**Test-driven.** 193 tests with race detection clean. Every endpoint tested against mock servers; integration tests against the real API.
 
 ## Install
 
@@ -212,6 +212,11 @@ if err != nil {
     }
 }
 ```
+
+## Upstream Reference
+
+This SDK tracks the [official Mistral Python SDK](https://github.com/mistralai/client-python)
+as its upstream reference for API surface and type definitions.
 
 ## License
 

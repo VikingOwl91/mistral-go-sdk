@@ -42,4 +42,10 @@
 // [conversation], [embedding], [model], [file], [finetune], [batch],
 // [ocr], [audio], [library], [moderation], [classification], and [fim].
 // All service methods live directly on [Client].
+//
+// # Reference
+//
+// This SDK tracks the official Mistral Python SDK
+// (https://github.com/mistralai/client-python) as its upstream reference
+// for API surface and type definitions.
 package mistral
