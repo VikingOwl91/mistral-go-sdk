@@ -39,9 +39,9 @@
 // # Sub-packages
 //
 // Types are organized into sub-packages by domain: [chat], [agents],
-// [conversation], [embedding], [model], [file], [finetune], [batch],
-// [ocr], [audio], [library], [moderation], [classification], and [fim].
-// All service methods live directly on [Client].
+// [connector], [conversation], [embedding], [model], [file], [finetune],
+// [batch], [ocr], [audio], [library], [moderation], [classification],
+// [fim], and [observability]. All service methods live directly on [Client].
 //
 // # Reference
 //

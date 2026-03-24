@@ -26,6 +26,7 @@ type CompletionRequest struct {
 	Prediction        *chat.Prediction       `json:"prediction,omitempty"`
 	PromptMode        *chat.PromptMode       `json:"prompt_mode,omitempty"`
 	Guardrails        []chat.GuardrailConfig `json:"guardrails,omitempty"`
+	ReasoningEffort   *chat.ReasoningEffort  `json:"reasoning_effort,omitempty"`
 	stream            bool
 }
 

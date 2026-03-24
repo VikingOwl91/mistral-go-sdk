@@ -24,7 +24,7 @@ func integrationClient(t *testing.T) *Client {
 func TestIntegration_ListModels(t *testing.T) {
 	client := integrationClient(t)
 
-	resp, err := client.ListModels(context.Background())
+	resp, err := client.ListModels(context.Background(), nil)
 	if err != nil {
 		t.Fatal(err)
 	}

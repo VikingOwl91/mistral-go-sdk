@@ -1,3 +1,37 @@
+## v1.1.0 — 2026-03-24
+
+Upstream sync with Python SDK v2.1.3. Adds Connectors, Audio Speech/Voices, and Observability (beta).
+
+### Breaking Changes
+
+- **`ListModels`** signature changed from `(ctx)` to `(ctx, *model.ListParams)`.
+  Pass `nil` for previous behavior. The new `ListParams` supports `Provider` and
+  `Model` query filters.
+- **`UploadFile`** signature changed from `(ctx, filename, reader, purpose)` to
+  `(ctx, filename, reader, *file.UploadParams)`. The new `UploadParams` struct
+  holds `Purpose`, `Expiry`, and `Visibility` fields.
+
+### Added
+
+- **`ReasoningEffort`** field on `chat.CompletionRequest` and
+  `agents.CompletionRequest` — controls reasoning effort (`"none"`, `"high"`).
+- **Connectors API** (new `connector/` package) — `CreateConnector`,
+  `ListConnectors`, `GetConnector`, `UpdateConnector`, `DeleteConnector`,
+  `GetConnectorAuthURL`, `ListConnectorTools`, `CallConnectorTool`.
+- **Audio Speech (TTS)** — `Speech`, `SpeechStream` with `SpeechStream` typed
+  wrapper, `SpeechOutputFormat` enum (pcm/wav/mp3/flac/opus).
+- **Audio Voices** — `ListVoices`, `CreateVoice`, `GetVoice`, `UpdateVoice`,
+  `DeleteVoice`, `GetVoiceSampleAudio`.
+- **Audio Realtime types** — `AudioEncoding`, `AudioFormat`, `RealtimeSession`,
+  and WebSocket message types in `audio/realtime.go`. No WebSocket client yet
+  (would require adding a dependency).
+- **Observability API** (new `observability/` package, beta) — campaigns,
+  chat completion events, judges, datasets, records, and import tasks.
+  33 service methods total.
+- **`file.Visibility`** enum — `shared_global`, `shared_org`,
+  `shared_workspace`, `private`.
+- **`model.ListParams`** — filter models by `Provider` and `Model`.
+
 ## v1.0.0 — 2026-03-17
 
 Stable release. Tracks upstream Python SDK v2.0.4.

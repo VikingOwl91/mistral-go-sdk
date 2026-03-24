@@ -9,6 +9,14 @@ const (
 	PromptModeReasoning PromptMode = "reasoning"
 )
 
+// ReasoningEffort controls the amount of reasoning effort the model uses.
+type ReasoningEffort string
+
+const (
+	ReasoningEffortNone ReasoningEffort = "none"
+	ReasoningEffortHigh ReasoningEffort = "high"
+)
+
 // Prediction provides expected completion content for optimization.
 type Prediction struct {
 	Type    string `json:"type"`
@@ -36,6 +44,7 @@ type CompletionRequest struct {
 	Prediction        *Prediction       `json:"prediction,omitempty"`
 	PromptMode        *PromptMode       `json:"prompt_mode,omitempty"`
 	Guardrails        []GuardrailConfig `json:"guardrails,omitempty"`
+	ReasoningEffort   *ReasoningEffort  `json:"reasoning_effort,omitempty"`
 	stream            bool
 }
 

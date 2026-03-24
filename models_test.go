@@ -6,6 +6,8 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
+
+	"somegit.dev/vikingowl/mistral-go-sdk/model"
 )
 
 func TestListModels_Success(t *testing.T) {
@@ -45,7 +47,7 @@ func TestListModels_Success(t *testing.T) {
 	defer server.Close()
 
 	client := NewClient("key", WithBaseURL(server.URL))
-	list, err := client.ListModels(context.Background())
+	list, err := client.ListModels(context.Background(), nil)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -79,6 +81,33 @@ func TestListModels_Success(t *testing.T) {
 	}
 	if ft.Root != "mistral-small-latest" {
 		t.Errorf("got root %q", ft.Root)
+	}
+}
+
+func TestListModels_WithParams(t *testing.T) {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Query().Get("provider") != "mistralai" {
+			t.Errorf("expected provider=mistralai, got %q", r.URL.Query().Get("provider"))
+		}
+		if r.URL.Query().Get("model") != "mistral-small" {
+			t.Errorf("expected model=mistral-small, got %q", r.URL.Query().Get("model"))
+		}
+		json.NewEncoder(w).Encode(map[string]any{
+			"object": "list",
+			"data":   []map[string]any{},
+		})
+	}))
+	defer server.Close()
+
+	provider := "mistralai"
+	modelName := "mistral-small"
+	client := NewClient("key", WithBaseURL(server.URL))
+	_, err := client.ListModels(context.Background(), &model.ListParams{
+		Provider: &provider,
+		Model:    &modelName,
+	})
+	if err != nil {
+		t.Fatal(err)
 	}
 }
 

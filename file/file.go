@@ -64,6 +64,23 @@ type SignedURL struct {
 	URL string `json:"url"`
 }
 
+// Visibility controls who can see a file.
+type Visibility string
+
+const (
+	VisibilitySharedGlobal    Visibility = "shared_global"
+	VisibilitySharedOrg       Visibility = "shared_org"
+	VisibilitySharedWorkspace Visibility = "shared_workspace"
+	VisibilityPrivate         Visibility = "private"
+)
+
+// UploadParams holds parameters for uploading a file.
+type UploadParams struct {
+	Purpose    Purpose
+	Expiry     *int
+	Visibility *Visibility
+}
+
 // ListParams holds optional parameters for listing files.
 type ListParams struct {
 	Page     *int
