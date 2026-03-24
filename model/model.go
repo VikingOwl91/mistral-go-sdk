@@ -52,3 +52,9 @@ type DeleteModelOut struct {
 	Object  string `json:"object"`
 	Deleted bool   `json:"deleted"`
 }
+
+// ListParams holds optional parameters for listing models.
+type ListParams struct {
+	Provider *string
+	Model    *string
+}

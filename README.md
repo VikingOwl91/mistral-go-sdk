@@ -11,7 +11,7 @@ The most complete Go client for the [Mistral AI API](https://docs.mistral.ai/).
 
 **Zero dependencies.** The entire SDK — including tests — uses only the Go standard library. No `go.sum`, no transitive dependency tree to audit, no version conflicts, no supply chain risk.
 
-**Full API coverage.** 75 methods across every Mistral endpoint — including Conversations, Agents CRUD, Libraries, OCR, Audio, Fine-tuning, and Batch Jobs. No other Go SDK covers Conversations or Agents.
+**Full API coverage.** 116 methods across every Mistral endpoint — including Connectors, Audio Speech/Voices, Conversations, Agents CRUD, Libraries, OCR, Observability, Fine-tuning, and Batch Jobs. No other Go SDK covers Conversations, Connectors, or Observability.
 
 **Typed streaming.** A generic pull-based `Stream[T]` iterator — no channels, no goroutines, no leaks. Just `Next()` / `Current()` / `Err()` / `Close()`.
 
@@ -132,7 +132,7 @@ for stream.Next() {
 
 ## API Coverage
 
-75 public methods on `Client`, grouped by domain:
+116 public methods on `Client`, grouped by domain:
 
 | Domain | Methods |
 |--------|---------|
@@ -140,6 +140,7 @@ for stream.Next() {
 | **FIM** | `FIMComplete`, `FIMCompleteStream` |
 | **Agents (completions)** | `AgentsComplete`, `AgentsCompleteStream` |
 | **Agents (CRUD)** | `CreateAgent`, `ListAgents`, `GetAgent`, `UpdateAgent`, `DeleteAgent`, `UpdateAgentVersion`, `ListAgentVersions`, `GetAgentVersion`, `SetAgentAlias`, `ListAgentAliases`, `DeleteAgentAlias` |
+| **Connectors** | `CreateConnector`, `ListConnectors`, `GetConnector`, `UpdateConnector`, `DeleteConnector`, `GetConnectorAuthURL`, `ListConnectorTools`, `CallConnectorTool` |
 | **Conversations** | `StartConversation`, `StartConversationStream`, `AppendConversation`, `AppendConversationStream`, `RestartConversation`, `RestartConversationStream`, `GetConversation`, `ListConversations`, `DeleteConversation`, `GetConversationHistory`, `GetConversationMessages` |
 | **Models** | `ListModels`, `GetModel`, `DeleteModel` |
 | **Files** | `UploadFile`, `ListFiles`, `GetFile`, `DeleteFile`, `GetFileContent`, `GetFileURL` |
@@ -147,10 +148,16 @@ for stream.Next() {
 | **Fine-tuning** | `CreateFineTuningJob`, `ListFineTuningJobs`, `GetFineTuningJob`, `CancelFineTuningJob`, `StartFineTuningJob`, `UpdateFineTunedModel`, `ArchiveFineTunedModel`, `UnarchiveFineTunedModel` |
 | **Batch** | `CreateBatchJob`, `ListBatchJobs`, `GetBatchJob`, `CancelBatchJob` |
 | **OCR** | `OCR` |
-| **Audio** | `Transcribe`, `TranscribeStream` |
+| **Audio (transcription)** | `Transcribe`, `TranscribeStream` |
+| **Audio (speech)** | `Speech`, `SpeechStream` |
+| **Audio (voices)** | `ListVoices`, `CreateVoice`, `GetVoice`, `UpdateVoice`, `DeleteVoice`, `GetVoiceSampleAudio` |
 | **Libraries** | `CreateLibrary`, `ListLibraries`, `GetLibrary`, `UpdateLibrary`, `DeleteLibrary`, `UploadDocument`, `ListDocuments`, `GetDocument`, `UpdateDocument`, `DeleteDocument`, `GetDocumentTextContent`, `GetDocumentStatus`, `GetDocumentSignedURL`, `GetDocumentExtractedTextSignedURL`, `ReprocessDocument`, `ListLibrarySharing`, `ShareLibrary`, `UnshareLibrary` |
 | **Moderation** | `Moderate`, `ModerateChat` |
 | **Classification** | `Classify`, `ClassifyChat` |
+| **Observability (campaigns)** | `CreateCampaign`, `ListCampaigns`, `GetCampaign`, `DeleteCampaign`, `GetCampaignStatus`, `ListCampaignEvents` |
+| **Observability (events)** | `SearchChatCompletionEvents`, `SearchChatCompletionEventIDs`, `GetChatCompletionEvent`, `GetSimilarChatCompletionEvents`, `JudgeChatCompletionEvent` |
+| **Observability (judges)** | `CreateJudge`, `ListJudges`, `GetJudge`, `UpdateJudge`, `DeleteJudge`, `JudgeConversation` |
+| **Observability (datasets)** | `CreateDataset`, `ListDatasets`, `GetDataset`, `UpdateDataset`, `DeleteDataset`, `ExportDatasetToJSONL`, `ListDatasetRecords`, `CreateDatasetRecord`, `GetDatasetRecord`, `UpdateDatasetRecordPayload`, `UpdateDatasetRecordProperties`, `DeleteDatasetRecord`, `BulkDeleteDatasetRecords`, `JudgeDatasetRecord`, `ImportDatasetFromCampaign`, `ImportDatasetFromExplorer`, `ImportDatasetFromFile`, `ImportDatasetFromPlayground`, `ImportDatasetFromDataset`, `ListDatasetTasks`, `GetDatasetTask` |
 
 ## Comparison
 
@@ -163,11 +170,13 @@ There is no official Go SDK from Mistral AI (only Python and TypeScript). The ma
 | Embeddings | Yes | Yes | Yes | Yes |
 | Tool calling | Yes | No | No | No |
 | Agents (completions + CRUD) | Yes | No | No | No |
+| Connectors (MCP) | Yes | No | No | No |
 | Conversations API | Yes | No | No | No |
 | Libraries / Documents | Yes | No | No | No |
 | Fine-tuning / Batch | Yes | No | No | No |
 | OCR | Yes | No | No | Yes |
-| Audio transcription | Yes | No | No | No |
+| Audio (transcription + TTS + voices) | Yes | No | No | No |
+| Observability (beta) | Yes | No | No | No |
 | Moderation / Classification | Yes | No | No | No |
 | Vision (multimodal) | Yes | No | No | Yes |
 | Zero dependencies | Yes | test-only (testify) | test-only (testify) | test-only (testify) |
@@ -221,6 +230,7 @@ as its upstream reference for API surface and type definitions.
 
 | SDK Version | Upstream Python SDK |
 |-------------|---------------------|
+| v1.1.0 | v2.1.3 |
 | v1.0.0 | v2.0.4 |
 
 ## License

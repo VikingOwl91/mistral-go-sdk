@@ -58,7 +58,7 @@ func TestUploadFile_Success(t *testing.T) {
 		context.Background(),
 		"train.jsonl",
 		strings.NewReader(`{"text":"hello"}`),
-		file.PurposeFineTune,
+		&file.UploadParams{Purpose: file.PurposeFineTune},
 	)
 	if err != nil {
 		t.Fatal(err)
@@ -71,6 +71,43 @@ func TestUploadFile_Success(t *testing.T) {
 	}
 	if resp.Purpose != file.PurposeFineTune {
 		t.Errorf("got purpose %q", resp.Purpose)
+	}
+}
+
+func TestUploadFile_WithExpiryAndVisibility(t *testing.T) {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if err := r.ParseMultipartForm(10 << 20); err != nil {
+			t.Fatal(err)
+		}
+		if r.FormValue("purpose") != "fine-tune" {
+			t.Errorf("got purpose %q", r.FormValue("purpose"))
+		}
+		if r.FormValue("expiry") != "48" {
+			t.Errorf("expected expiry=48, got %q", r.FormValue("expiry"))
+		}
+		if r.FormValue("visibility") != "private" {
+			t.Errorf("expected visibility=private, got %q", r.FormValue("visibility"))
+		}
+
+		json.NewEncoder(w).Encode(map[string]any{
+			"id": "file-ev", "object": "file", "bytes": 10,
+			"created_at": 1, "filename": "data.jsonl",
+			"purpose": "fine-tune", "sample_type": "instruct",
+			"source": "upload",
+		})
+	}))
+	defer server.Close()
+
+	expiry := 48
+	vis := file.VisibilityPrivate
+	client := NewClient("key", WithBaseURL(server.URL))
+	_, err := client.UploadFile(context.Background(), "data.jsonl", strings.NewReader("{}"), &file.UploadParams{
+		Purpose:    file.PurposeFineTune,
+		Expiry:     &expiry,
+		Visibility: &vis,
+	})
+	if err != nil {
+		t.Fatal(err)
 	}
 }
 
@@ -260,7 +297,7 @@ func TestUploadFile_Error(t *testing.T) {
 	defer server.Close()
 
 	client := NewClient("key", WithBaseURL(server.URL))
-	_, err := client.UploadFile(context.Background(), "bad.txt", strings.NewReader(""), file.PurposeFineTune)
+	_, err := client.UploadFile(context.Background(), "bad.txt", strings.NewReader(""), &file.UploadParams{Purpose: file.PurposeFineTune})
 	if err == nil {
 		t.Fatal("expected error")
 	}

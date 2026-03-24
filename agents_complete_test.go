@@ -114,6 +114,39 @@ func TestAgentsComplete_WithTools(t *testing.T) {
 	}
 }
 
+func TestAgentsComplete_ReasoningEffort(t *testing.T) {
+	effort := chat.ReasoningEffortHigh
+
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		var body map[string]any
+		json.NewDecoder(r.Body).Decode(&body)
+		if body["reasoning_effort"] != "high" {
+			t.Errorf("expected reasoning_effort=high, got %v", body["reasoning_effort"])
+		}
+
+		json.NewEncoder(w).Encode(map[string]any{
+			"id": "a-re", "object": "chat.completion",
+			"model": "m", "created": 0,
+			"choices": []map[string]any{{
+				"index": 0, "message": map[string]any{"role": "assistant", "content": "ok"},
+				"finish_reason": "stop",
+			}},
+			"usage": map[string]any{"prompt_tokens": 0, "completion_tokens": 0, "total_tokens": 0},
+		})
+	}))
+	defer server.Close()
+
+	client := NewClient("key", WithBaseURL(server.URL))
+	_, err := client.AgentsComplete(context.Background(), &agents.CompletionRequest{
+		AgentID:         "agent-1",
+		Messages:        []chat.Message{&chat.UserMessage{Content: chat.TextContent("Hi")}},
+		ReasoningEffort: &effort,
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+}
+
 func TestAgentsCompleteStream_Success(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		var body map[string]any

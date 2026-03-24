@@ -350,6 +350,41 @@ func TestChatComplete_RequestBody(t *testing.T) {
 	}
 }
 
+func TestChatComplete_ReasoningEffort(t *testing.T) {
+	effort := chat.ReasoningEffortHigh
+
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		bodyBytes, _ := io.ReadAll(r.Body)
+		var body map[string]any
+		json.Unmarshal(bodyBytes, &body)
+
+		if body["reasoning_effort"] != "high" {
+			t.Errorf("expected reasoning_effort=high, got %v", body["reasoning_effort"])
+		}
+
+		json.NewEncoder(w).Encode(map[string]any{
+			"id": "chat-re", "object": "chat.completion",
+			"model": "m", "created": 0,
+			"choices": []map[string]any{{
+				"index": 0, "message": map[string]any{"role": "assistant", "content": "ok"},
+				"finish_reason": "stop",
+			}},
+			"usage": map[string]any{"prompt_tokens": 0, "completion_tokens": 0, "total_tokens": 0},
+		})
+	}))
+	defer server.Close()
+
+	client := NewClient("key", WithBaseURL(server.URL))
+	_, err := client.ChatComplete(context.Background(), &chat.CompletionRequest{
+		Model:           "m",
+		Messages:        []chat.Message{&chat.UserMessage{Content: chat.TextContent("Hi")}},
+		ReasoningEffort: &effort,
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+}
+
 func TestChatComplete_ContextCanceled(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		// Never responds — context should cancel first
