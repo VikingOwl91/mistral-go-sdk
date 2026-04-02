@@ -339,17 +339,27 @@ type StreamWorkflowContext struct {
 
 // EventStreamParams holds query parameters for streaming workflow events.
 type EventStreamParams struct {
-	Source      *EventSource
-	LastEventID *string
-	Scope       *Scope
+	Scope                *Scope
+	ActivityName         *string
+	ActivityID           *string
+	WorkflowName         *string
+	WorkflowExecID       *string
+	RootWorkflowExecID   *string
+	ParentWorkflowExecID *string
+	Stream               *string
+	StartSeq             *int
+	MetadataFilters      map[string]any
+	WorkflowEventTypes   []EventType
+	LastEventID          *string
 }
 
 // EventListParams holds query parameters for listing workflow events.
 type EventListParams struct {
-	Source *EventSource
-	Scope  *Scope
-	Cursor *string
-	Limit  *int
+	RootWorkflowExecID *string
+	WorkflowExecID     *string
+	WorkflowRunID      *string
+	Limit              *int
+	Cursor             *string
 }
 
 // EventListResponse is the response from listing workflow events.
