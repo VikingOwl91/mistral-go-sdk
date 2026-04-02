@@ -325,7 +325,10 @@ func UnmarshalEvent(data []byte) (Event, error) {
 
 // StreamPayload is a single SSE payload from the workflow event stream.
 type StreamPayload struct {
-	Data json.RawMessage `json:"data"`
+	Stream          string                `json:"stream"`
+	Data            json.RawMessage       `json:"data"`
+	WorkflowContext StreamWorkflowContext `json:"workflow_context"`
+	BrokerSequence  int64                 `json:"broker_sequence"`
 }
 
 // StreamWorkflowContext holds context for a workflow event stream.
