@@ -76,3 +76,12 @@ func (c *Client) CancelBatchJob(ctx context.Context, jobID string) (*batch.JobOu
 	}
 	return &resp, nil
 }
+
+// DeleteBatchJob deletes a batch job.
+func (c *Client) DeleteBatchJob(ctx context.Context, jobID string) (*batch.DeleteResponse, error) {
+	var resp batch.DeleteResponse
+	if err := c.doJSON(ctx, "DELETE", fmt.Sprintf("/v1/batch/jobs/%s", jobID), nil, &resp); err != nil {
+		return nil, err
+	}
+	return &resp, nil
+}

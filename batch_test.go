@@ -121,3 +121,30 @@ func TestCancelBatchJob_Success(t *testing.T) {
 		t.Errorf("got status %q", job.Status)
 	}
 }
+
+func TestDeleteBatchJob_Success(t *testing.T) {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != "DELETE" {
+			t.Errorf("expected DELETE, got %s", r.Method)
+		}
+		if r.URL.Path != "/v1/batch/jobs/batch-123" {
+			t.Errorf("got path %s", r.URL.Path)
+		}
+		json.NewEncoder(w).Encode(map[string]any{
+			"id": "batch-123", "object": "batch", "deleted": true,
+		})
+	}))
+	defer server.Close()
+
+	client := NewClient("key", WithBaseURL(server.URL))
+	resp, err := client.DeleteBatchJob(context.Background(), "batch-123")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if resp.ID != "batch-123" {
+		t.Errorf("got id %q", resp.ID)
+	}
+	if !resp.Deleted {
+		t.Error("expected deleted=true")
+	}
+}
