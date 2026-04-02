@@ -60,3 +60,10 @@ type ListParams struct {
 	Status       []string
 	OrderBy      *string
 }
+
+// DeleteResponse is the response from deleting a batch job.
+type DeleteResponse struct {
+	ID      string `json:"id"`
+	Object  string `json:"object"`
+	Deleted bool   `json:"deleted"`
+}
