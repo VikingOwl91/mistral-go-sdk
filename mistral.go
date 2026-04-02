@@ -6,7 +6,7 @@ import (
 )
 
 // Version is the SDK version string.
-const Version = "1.1.0"
+const Version = "1.2.0"
 
 const (
 	defaultBaseURL = "https://api.mistral.ai"

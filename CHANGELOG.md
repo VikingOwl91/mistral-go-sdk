@@ -1,3 +1,35 @@
+## v1.2.0 — 2026-04-02
+
+Upstream sync with Python SDK v2.2.0. Adds Workflows API and DeleteBatchJob.
+
+### Added
+
+- **Workflows API** (new `workflow/` package) — complete workflow orchestration
+  support with 37 service methods across 8 sub-resources:
+  - **Workflows CRUD** — `ListWorkflows`, `GetWorkflow`, `UpdateWorkflow`,
+    `ArchiveWorkflow`, `UnarchiveWorkflow`, `ExecuteWorkflow`,
+    `ExecuteWorkflowAndWait`.
+  - **Registrations** — `ListWorkflowRegistrations`, `GetWorkflowRegistration`,
+    `ExecuteWorkflowRegistration` (deprecated).
+  - **Executions** — `GetWorkflowExecution`, `GetWorkflowExecutionHistory`,
+    `StreamWorkflowExecution`, `SignalWorkflowExecution`,
+    `QueryWorkflowExecution`, `UpdateWorkflowExecution`,
+    `TerminateWorkflowExecution`, `CancelWorkflowExecution`,
+    `ResetWorkflowExecution`, `BatchCancelWorkflowExecutions`,
+    `BatchTerminateWorkflowExecutions`.
+  - **Trace** — `GetWorkflowExecutionTraceOTel`,
+    `GetWorkflowExecutionTraceSummary`, `GetWorkflowExecutionTraceEvents`.
+  - **Events** — `StreamWorkflowEvents`, `ListWorkflowEvents`.
+  - **Deployments** — `ListWorkflowDeployments`, `GetWorkflowDeployment`.
+  - **Metrics** — `GetWorkflowMetrics`.
+  - **Runs** — `ListWorkflowRuns`, `GetWorkflowRun`, `GetWorkflowRunHistory`.
+  - **Schedules** — `ListWorkflowSchedules`, `ScheduleWorkflow`,
+    `UnscheduleWorkflow`.
+  - **Workers** — `GetWorkflowWorkerInfo`.
+- **`WorkflowEventStream`** — typed SSE stream wrapper with `StreamPayload`
+  envelope, sealed `Event` interface (17 concrete types + `UnknownEvent`).
+- **`DeleteBatchJob`** — delete a batch job by ID.
+
 ## v1.1.0 — 2026-03-24
 
 Upstream sync with Python SDK v2.1.3. Adds Connectors, Audio Speech/Voices, and Observability (beta).
