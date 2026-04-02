@@ -11,15 +11,15 @@ The most complete Go client for the [Mistral AI API](https://docs.mistral.ai/).
 
 **Zero dependencies.** The entire SDK — including tests — uses only the Go standard library. No `go.sum`, no transitive dependency tree to audit, no version conflicts, no supply chain risk.
 
-**Full API coverage.** 116 methods across every Mistral endpoint — including Connectors, Audio Speech/Voices, Conversations, Agents CRUD, Libraries, OCR, Observability, Fine-tuning, and Batch Jobs. No other Go SDK covers Conversations, Connectors, or Observability.
+**Full API coverage.** 166 methods across every Mistral endpoint — including Workflows, Connectors, Audio Speech/Voices, Conversations, Agents CRUD, Libraries, OCR, Observability, Fine-tuning, and Batch Jobs. No other Go SDK covers Workflows, Conversations, Connectors, or Observability.
 
 **Typed streaming.** A generic pull-based `Stream[T]` iterator — no channels, no goroutines, no leaks. Just `Next()` / `Current()` / `Err()` / `Close()`.
 
-**Forward-compatible.** Unknown types (`UnknownEntry`, `UnknownEvent`, `UnknownMessage`, `UnknownChunk`, `UnknownAgentTool`) capture raw JSON instead of returning errors. When Mistral ships a new message role or event type, your code keeps running — it doesn't panic.
+**Forward-compatible.** Unknown types (`UnknownEntry`, `UnknownEvent`, `UnknownMessage`, `UnknownChunk`, `UnknownAgentTool`, workflow `UnknownEvent`) capture raw JSON instead of returning errors. When Mistral ships a new message role or event type, your code keeps running — it doesn't panic.
 
 **Hand-written, not generated.** Idiomatic Go with sealed interfaces, discriminated unions, and functional options — not a Speakeasy/OpenAPI auto-gen dump with `any` everywhere.
 
-**Test-driven.** 193 tests with race detection clean. Every endpoint tested against mock servers; integration tests against the real API.
+**Test-driven.** 284 tests with race detection clean. Every endpoint tested against mock servers; integration tests against the real API.
 
 ## Install
 
@@ -132,7 +132,7 @@ for stream.Next() {
 
 ## API Coverage
 
-116 public methods on `Client`, grouped by domain:
+166 public methods on `Client`, grouped by domain:
 
 | Domain | Methods |
 |--------|---------|
@@ -146,7 +146,7 @@ for stream.Next() {
 | **Files** | `UploadFile`, `ListFiles`, `GetFile`, `DeleteFile`, `GetFileContent`, `GetFileURL` |
 | **Embeddings** | `CreateEmbeddings` |
 | **Fine-tuning** | `CreateFineTuningJob`, `ListFineTuningJobs`, `GetFineTuningJob`, `CancelFineTuningJob`, `StartFineTuningJob`, `UpdateFineTunedModel`, `ArchiveFineTunedModel`, `UnarchiveFineTunedModel` |
-| **Batch** | `CreateBatchJob`, `ListBatchJobs`, `GetBatchJob`, `CancelBatchJob` |
+| **Batch** | `CreateBatchJob`, `ListBatchJobs`, `GetBatchJob`, `CancelBatchJob`, `DeleteBatchJob` |
 | **OCR** | `OCR` |
 | **Audio (transcription)** | `Transcribe`, `TranscribeStream` |
 | **Audio (speech)** | `Speech`, `SpeechStream` |
@@ -158,6 +158,16 @@ for stream.Next() {
 | **Observability (events)** | `SearchChatCompletionEvents`, `SearchChatCompletionEventIDs`, `GetChatCompletionEvent`, `GetSimilarChatCompletionEvents`, `JudgeChatCompletionEvent` |
 | **Observability (judges)** | `CreateJudge`, `ListJudges`, `GetJudge`, `UpdateJudge`, `DeleteJudge`, `JudgeConversation` |
 | **Observability (datasets)** | `CreateDataset`, `ListDatasets`, `GetDataset`, `UpdateDataset`, `DeleteDataset`, `ExportDatasetToJSONL`, `ListDatasetRecords`, `CreateDatasetRecord`, `GetDatasetRecord`, `UpdateDatasetRecordPayload`, `UpdateDatasetRecordProperties`, `DeleteDatasetRecord`, `BulkDeleteDatasetRecords`, `JudgeDatasetRecord`, `ImportDatasetFromCampaign`, `ImportDatasetFromExplorer`, `ImportDatasetFromFile`, `ImportDatasetFromPlayground`, `ImportDatasetFromDataset`, `ListDatasetTasks`, `GetDatasetTask` |
+| **Workflows (CRUD)** | `ListWorkflows`, `GetWorkflow`, `UpdateWorkflow`, `ArchiveWorkflow`, `UnarchiveWorkflow`, `ExecuteWorkflow`, `ExecuteWorkflowAndWait` |
+| **Workflows (registrations)** | `ListWorkflowRegistrations`, `GetWorkflowRegistration`, `ExecuteWorkflowRegistration` |
+| **Workflows (executions)** | `GetWorkflowExecution`, `GetWorkflowExecutionHistory`, `StreamWorkflowExecution`, `SignalWorkflowExecution`, `QueryWorkflowExecution`, `UpdateWorkflowExecution`, `TerminateWorkflowExecution`, `CancelWorkflowExecution`, `ResetWorkflowExecution`, `BatchCancelWorkflowExecutions`, `BatchTerminateWorkflowExecutions` |
+| **Workflows (trace)** | `GetWorkflowExecutionTraceOTel`, `GetWorkflowExecutionTraceSummary`, `GetWorkflowExecutionTraceEvents` |
+| **Workflows (events)** | `StreamWorkflowEvents`, `ListWorkflowEvents` |
+| **Workflows (deployments)** | `ListWorkflowDeployments`, `GetWorkflowDeployment` |
+| **Workflows (metrics)** | `GetWorkflowMetrics` |
+| **Workflows (runs)** | `ListWorkflowRuns`, `GetWorkflowRun`, `GetWorkflowRunHistory` |
+| **Workflows (schedules)** | `ListWorkflowSchedules`, `ScheduleWorkflow`, `UnscheduleWorkflow` |
+| **Workflows (workers)** | `GetWorkflowWorkerInfo` |
 
 ## Comparison
 
@@ -176,6 +186,7 @@ There is no official Go SDK from Mistral AI (only Python and TypeScript). The ma
 | Fine-tuning / Batch | Yes | No | No | No |
 | OCR | Yes | No | No | Yes |
 | Audio (transcription + TTS + voices) | Yes | No | No | No |
+| Workflows API | Yes | No | No | No |
 | Observability (beta) | Yes | No | No | No |
 | Moderation / Classification | Yes | No | No | No |
 | Vision (multimodal) | Yes | No | No | Yes |
@@ -230,6 +241,7 @@ as its upstream reference for API surface and type definitions.
 
 | SDK Version | Upstream Python SDK |
 |-------------|---------------------|
+| v1.2.0 | v2.2.0 |
 | v1.1.0 | v2.1.3 |
 | v1.0.0 | v2.0.4 |
 
