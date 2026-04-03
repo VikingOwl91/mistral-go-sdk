@@ -2,8 +2,12 @@ package workflow
 
 // Registration represents a workflow registration.
 type Registration struct {
-	ID         string    `json:"id"`
-	WorkflowID string    `json:"workflow_id"`
+	ID                         string          `json:"id"`
+	WorkflowID                 string          `json:"workflow_id"`
+	Definition                 *CodeDefinition `json:"definition,omitempty"`
+	DeploymentID               *string         `json:"deployment_id,omitempty"`
+	CompatibleWithChatAssistant bool           `json:"compatible_with_chat_assistant,omitempty"`
+	// Deprecated: use DeploymentID instead. Will be removed in a future release.
 	TaskQueue  string    `json:"task_queue"`
 	Workflow   *Workflow `json:"workflow,omitempty"`
 	CreatedAt  string    `json:"created_at"`
@@ -34,11 +38,4 @@ type RegistrationListParams struct {
 type RegistrationGetParams struct {
 	WithWorkflow  *bool
 	IncludeShared *bool
-}
-
-// WorkerInfo holds information about the current worker.
-type WorkerInfo struct {
-	SchedulerURL string `json:"scheduler_url"`
-	Namespace    string `json:"namespace"`
-	TLS          bool   `json:"tls"`
 }
