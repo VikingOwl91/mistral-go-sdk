@@ -241,6 +241,7 @@ as its upstream reference for API surface and type definitions.
 
 | SDK Version | Upstream Python SDK |
 |-------------|---------------------|
+| v1.2.1 | v2.2.0 |
 | v1.2.0 | v2.2.0 |
 | v1.1.0 | v2.1.3 |
 | v1.0.0 | v2.0.4 |
