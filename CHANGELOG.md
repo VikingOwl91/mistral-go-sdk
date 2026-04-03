@@ -1,3 +1,34 @@
+## v1.3.0 — 2026-04-03
+
+Upstream sync with Python SDK v2.3.0. Updates workflow registration model
+to reflect the managed deployment architecture and removes the deprecated
+workers endpoint.
+
+### Added
+
+- **`workflow.CodeDefinition`** — workflow interface metadata type with
+  input/output schemas, signal/query/update handler definitions,
+  determinism flag, and execution timeout.
+- **`workflow.SignalDefinition`**, **`QueryDefinition`**,
+  **`UpdateDefinition`** — handler descriptor types.
+- **`Registration.Definition`** — code definition field on workflow
+  registrations.
+- **`Registration.DeploymentID`** — replaces the worker/task-queue model
+  with managed deployment references.
+- **`Registration.CompatibleWithChatAssistant`** — flag for chat assistant
+  compatibility.
+
+### Deprecated
+
+- **`Registration.TaskQueue`** — use `DeploymentID` instead. Will be
+  removed in a future release.
+
+### Removed (breaking)
+
+- **`GetWorkflowWorkerInfo`** — the `/v1/workflows/workers/whoami` endpoint
+  was removed upstream.
+- **`workflow.WorkerInfo`** — type no longer exists in the API.
+
 ## v1.2.1 — 2026-04-03
 
 Move module path to `github.com/VikingOwl91/mistral-go-sdk` for public

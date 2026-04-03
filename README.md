@@ -11,7 +11,7 @@ The most complete Go client for the [Mistral AI API](https://docs.mistral.ai/).
 
 **Zero dependencies.** The entire SDK — including tests — uses only the Go standard library. No `go.sum`, no transitive dependency tree to audit, no version conflicts, no supply chain risk.
 
-**Full API coverage.** 166 methods across every Mistral endpoint — including Workflows, Connectors, Audio Speech/Voices, Conversations, Agents CRUD, Libraries, OCR, Observability, Fine-tuning, and Batch Jobs. No other Go SDK covers Workflows, Conversations, Connectors, or Observability.
+**Full API coverage.** 165 methods across every Mistral endpoint — including Workflows, Connectors, Audio Speech/Voices, Conversations, Agents CRUD, Libraries, OCR, Observability, Fine-tuning, and Batch Jobs. No other Go SDK covers Workflows, Conversations, Connectors, or Observability.
 
 **Typed streaming.** A generic pull-based `Stream[T]` iterator — no channels, no goroutines, no leaks. Just `Next()` / `Current()` / `Err()` / `Close()`.
 
@@ -132,7 +132,7 @@ for stream.Next() {
 
 ## API Coverage
 
-166 public methods on `Client`, grouped by domain:
+165 public methods on `Client`, grouped by domain:
 
 | Domain | Methods |
 |--------|---------|
@@ -167,7 +167,6 @@ for stream.Next() {
 | **Workflows (metrics)** | `GetWorkflowMetrics` |
 | **Workflows (runs)** | `ListWorkflowRuns`, `GetWorkflowRun`, `GetWorkflowRunHistory` |
 | **Workflows (schedules)** | `ListWorkflowSchedules`, `ScheduleWorkflow`, `UnscheduleWorkflow` |
-| **Workflows (workers)** | `GetWorkflowWorkerInfo` |
 
 ## Comparison
 
@@ -241,6 +240,7 @@ as its upstream reference for API surface and type definitions.
 
 | SDK Version | Upstream Python SDK |
 |-------------|---------------------|
+| v1.3.0 | v2.3.0 |
 | v1.2.1 | v2.2.0 |
 | v1.2.0 | v2.2.0 |
 | v1.1.0 | v2.1.3 |
