@@ -3,7 +3,7 @@
 The most complete Go client for the [Mistral AI API](https://docs.mistral.ai/).
 
 <!-- Badges -->
-[![Go Reference](https://pkg.go.dev/badge/somegit.dev/vikingowl/mistral-go-sdk.svg)](https://pkg.go.dev/somegit.dev/vikingowl/mistral-go-sdk)
+[![Go Reference](https://pkg.go.dev/badge/github.com/VikingOwl91/mistral-go-sdk.svg)](https://pkg.go.dev/github.com/VikingOwl91/mistral-go-sdk)
 ![Go Version](https://img.shields.io/badge/go-1.26-blue)
 ![License](https://img.shields.io/badge/license-MIT-green)
 
@@ -24,7 +24,7 @@ The most complete Go client for the [Mistral AI API](https://docs.mistral.ai/).
 ## Install
 
 ```sh
-go get somegit.dev/vikingowl/mistral-go-sdk
+go get github.com/VikingOwl91/mistral-go-sdk
 ```
 
 ## Quick Start
@@ -39,8 +39,8 @@ import (
     "fmt"
     "log"
 
-    mistral "somegit.dev/vikingowl/mistral-go-sdk"
-    "somegit.dev/vikingowl/mistral-go-sdk/chat"
+    mistral "github.com/VikingOwl91/mistral-go-sdk"
+    "github.com/VikingOwl91/mistral-go-sdk/chat"
 )
 
 func main() {
@@ -112,7 +112,7 @@ resp, err := client.ChatComplete(ctx, &chat.CompletionRequest{
 ### Conversations
 
 ```go
-import "somegit.dev/vikingowl/mistral-go-sdk/conversation"
+import "github.com/VikingOwl91/mistral-go-sdk/conversation"
 
 resp, err := client.StartConversation(ctx, &conversation.StartRequest{
     AgentID: "ag-your-agent-id",

@@ -7,7 +7,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"somegit.dev/vikingowl/mistral-go-sdk/agents"
+	"github.com/VikingOwl91/mistral-go-sdk/agents"
 )
 
 func TestCreateAgent_Success(t *testing.T) {

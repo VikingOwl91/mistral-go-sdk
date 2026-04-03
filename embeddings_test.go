@@ -7,7 +7,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"somegit.dev/vikingowl/mistral-go-sdk/embedding"
+	"github.com/VikingOwl91/mistral-go-sdk/embedding"
 )
 
 func TestCreateEmbeddings_Success(t *testing.T) {

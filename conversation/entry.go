@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"somegit.dev/vikingowl/mistral-go-sdk/chat"
+	"github.com/VikingOwl91/mistral-go-sdk/chat"
 )
 
 // Entry is a sealed interface for conversation history entries.

@@ -7,7 +7,7 @@ import (
 	"io"
 	"net/http"
 
-	"somegit.dev/vikingowl/mistral-go-sdk/audio"
+	"github.com/VikingOwl91/mistral-go-sdk/audio"
 )
 
 // Transcribe sends an audio file for transcription.

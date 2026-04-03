@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"net/url"
 
-	"somegit.dev/vikingowl/mistral-go-sdk/workflow"
+	"github.com/VikingOwl91/mistral-go-sdk/workflow"
 )
 
 // GetWorkflowMetrics retrieves performance metrics for a workflow.

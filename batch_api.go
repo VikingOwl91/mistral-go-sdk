@@ -7,7 +7,7 @@ import (
 	"strconv"
 	"strings"
 
-	"somegit.dev/vikingowl/mistral-go-sdk/batch"
+	"github.com/VikingOwl91/mistral-go-sdk/batch"
 )
 
 // CreateBatchJob creates a new batch inference job.

@@ -8,8 +8,8 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"somegit.dev/vikingowl/mistral-go-sdk/agents"
-	"somegit.dev/vikingowl/mistral-go-sdk/chat"
+	"github.com/VikingOwl91/mistral-go-sdk/agents"
+	"github.com/VikingOwl91/mistral-go-sdk/chat"
 )
 
 func TestAgentsComplete_Success(t *testing.T) {

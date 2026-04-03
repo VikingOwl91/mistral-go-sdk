@@ -1144,7 +1144,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"somegit.dev/vikingowl/mistral-go-sdk/workflow"
+	"github.com/VikingOwl91/mistral-go-sdk/workflow"
 )
 
 func TestListWorkflows_Success(t *testing.T) {
@@ -1387,7 +1387,7 @@ import (
 	"strconv"
 	"time"
 
-	"somegit.dev/vikingowl/mistral-go-sdk/workflow"
+	"github.com/VikingOwl91/mistral-go-sdk/workflow"
 )
 
 // ListWorkflows lists workflows.
@@ -1616,7 +1616,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"somegit.dev/vikingowl/mistral-go-sdk/workflow"
+	"github.com/VikingOwl91/mistral-go-sdk/workflow"
 )
 
 func TestGetWorkflowExecution_Success(t *testing.T) {
@@ -1849,7 +1849,7 @@ import (
 	"net/url"
 	"strconv"
 
-	"somegit.dev/vikingowl/mistral-go-sdk/workflow"
+	"github.com/VikingOwl91/mistral-go-sdk/workflow"
 )
 
 // GetWorkflowExecution retrieves a workflow execution by ID.
@@ -2099,7 +2099,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"somegit.dev/vikingowl/mistral-go-sdk/workflow"
+	"github.com/VikingOwl91/mistral-go-sdk/workflow"
 )
 
 func TestListWorkflowEvents_Success(t *testing.T) {
@@ -2241,7 +2241,7 @@ func TestGetWorkflowMetrics_Success(t *testing.T) {
 }
 ```
 
-Add `"somegit.dev/vikingowl/mistral-go-sdk/workflow"` import to `workflows_metrics_test.go`.
+Add `"github.com/VikingOwl91/mistral-go-sdk/workflow"` import to `workflows_metrics_test.go`.
 
 - [ ] **Step 2: Run tests to verify they fail**
 
@@ -2262,7 +2262,7 @@ import (
 	"strconv"
 	"strings"
 
-	"somegit.dev/vikingowl/mistral-go-sdk/workflow"
+	"github.com/VikingOwl91/mistral-go-sdk/workflow"
 )
 
 // StreamWorkflowEvents streams workflow events via SSE.
@@ -2365,7 +2365,7 @@ import (
 	"net/url"
 	"strconv"
 
-	"somegit.dev/vikingowl/mistral-go-sdk/workflow"
+	"github.com/VikingOwl91/mistral-go-sdk/workflow"
 )
 
 // ListWorkflowDeployments lists workflow deployments.
@@ -2410,7 +2410,7 @@ import (
 	"fmt"
 	"net/url"
 
-	"somegit.dev/vikingowl/mistral-go-sdk/workflow"
+	"github.com/VikingOwl91/mistral-go-sdk/workflow"
 )
 
 // GetWorkflowMetrics retrieves performance metrics for a workflow.
@@ -2534,7 +2534,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"somegit.dev/vikingowl/mistral-go-sdk/workflow"
+	"github.com/VikingOwl91/mistral-go-sdk/workflow"
 )
 
 func TestScheduleWorkflow_Success(t *testing.T) {
@@ -2675,7 +2675,7 @@ import (
 	"net/url"
 	"strconv"
 
-	"somegit.dev/vikingowl/mistral-go-sdk/workflow"
+	"github.com/VikingOwl91/mistral-go-sdk/workflow"
 )
 
 // ListWorkflowRuns lists workflow runs.
@@ -2737,7 +2737,7 @@ import (
 	"context"
 	"fmt"
 
-	"somegit.dev/vikingowl/mistral-go-sdk/workflow"
+	"github.com/VikingOwl91/mistral-go-sdk/workflow"
 )
 
 // ListWorkflowSchedules lists workflow schedules.
@@ -2780,7 +2780,7 @@ package mistral
 import (
 	"context"
 
-	"somegit.dev/vikingowl/mistral-go-sdk/workflow"
+	"github.com/VikingOwl91/mistral-go-sdk/workflow"
 )
 
 // GetWorkflowWorkerInfo retrieves information about the current worker.

@@ -6,7 +6,7 @@ import (
 	"net/url"
 	"strconv"
 
-	"somegit.dev/vikingowl/mistral-go-sdk/observability"
+	"github.com/VikingOwl91/mistral-go-sdk/observability"
 )
 
 // CreateCampaign creates a new observability campaign.

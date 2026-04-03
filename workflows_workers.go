@@ -3,7 +3,7 @@ package mistral
 import (
 	"context"
 
-	"somegit.dev/vikingowl/mistral-go-sdk/workflow"
+	"github.com/VikingOwl91/mistral-go-sdk/workflow"
 )
 
 // GetWorkflowWorkerInfo retrieves information about the current worker.

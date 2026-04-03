@@ -8,7 +8,7 @@ import (
 	"net/url"
 	"strconv"
 
-	"somegit.dev/vikingowl/mistral-go-sdk/file"
+	"github.com/VikingOwl91/mistral-go-sdk/file"
 )
 
 // UploadFile uploads a file for use with fine-tuning, batch, or OCR.

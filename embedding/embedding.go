@@ -1,6 +1,6 @@
 package embedding
 
-import "somegit.dev/vikingowl/mistral-go-sdk/chat"
+import "github.com/VikingOwl91/mistral-go-sdk/chat"
 
 // Dtype specifies the data type of output embeddings.
 type Dtype string

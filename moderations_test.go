@@ -7,8 +7,8 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"somegit.dev/vikingowl/mistral-go-sdk/classification"
-	"somegit.dev/vikingowl/mistral-go-sdk/moderation"
+	"github.com/VikingOwl91/mistral-go-sdk/classification"
+	"github.com/VikingOwl91/mistral-go-sdk/moderation"
 )
 
 func TestModerate_Success(t *testing.T) {

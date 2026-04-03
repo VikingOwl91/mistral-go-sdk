@@ -8,7 +8,7 @@ import (
 	"strings"
 	"testing"
 
-	"somegit.dev/vikingowl/mistral-go-sdk/audio"
+	"github.com/VikingOwl91/mistral-go-sdk/audio"
 )
 
 func TestTranscribe_WithFileURL(t *testing.T) {

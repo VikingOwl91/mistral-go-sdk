@@ -9,7 +9,7 @@ import (
 	"strings"
 	"testing"
 
-	"somegit.dev/vikingowl/mistral-go-sdk/file"
+	"github.com/VikingOwl91/mistral-go-sdk/file"
 )
 
 func TestUploadFile_Success(t *testing.T) {

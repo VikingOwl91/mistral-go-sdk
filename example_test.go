@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"log"
 
-	mistral "somegit.dev/vikingowl/mistral-go-sdk"
-	"somegit.dev/vikingowl/mistral-go-sdk/chat"
-	"somegit.dev/vikingowl/mistral-go-sdk/embedding"
+	mistral "github.com/VikingOwl91/mistral-go-sdk"
+	"github.com/VikingOwl91/mistral-go-sdk/chat"
+	"github.com/VikingOwl91/mistral-go-sdk/embedding"
 )
 
 func ExampleNewClient() {

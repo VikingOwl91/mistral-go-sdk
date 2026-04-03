@@ -8,7 +8,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"somegit.dev/vikingowl/mistral-go-sdk/chat"
+	"github.com/VikingOwl91/mistral-go-sdk/chat"
 )
 
 func TestChatComplete_Success(t *testing.T) {

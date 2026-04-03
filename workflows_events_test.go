@@ -7,7 +7,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"somegit.dev/vikingowl/mistral-go-sdk/workflow"
+	"github.com/VikingOwl91/mistral-go-sdk/workflow"
 )
 
 func TestListWorkflowEvents_Success(t *testing.T) {

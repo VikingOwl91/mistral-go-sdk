@@ -1,6 +1,6 @@
 package moderation
 
-import "somegit.dev/vikingowl/mistral-go-sdk/chat"
+import "github.com/VikingOwl91/mistral-go-sdk/chat"
 
 // Request represents a text moderation request (/v1/moderations).
 type Request struct {

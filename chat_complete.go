@@ -3,7 +3,7 @@ package mistral
 import (
 	"context"
 
-	"somegit.dev/vikingowl/mistral-go-sdk/chat"
+	"github.com/VikingOwl91/mistral-go-sdk/chat"
 )
 
 // ChatComplete sends a chat completion request and returns the full response.

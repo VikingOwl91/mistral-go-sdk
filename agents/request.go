@@ -3,7 +3,7 @@ package agents
 import (
 	"encoding/json"
 
-	"somegit.dev/vikingowl/mistral-go-sdk/chat"
+	"github.com/VikingOwl91/mistral-go-sdk/chat"
 )
 
 // CompletionRequest represents an agents completion request.

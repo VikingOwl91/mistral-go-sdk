@@ -8,7 +8,7 @@ import (
 	"strings"
 	"testing"
 
-	"somegit.dev/vikingowl/mistral-go-sdk/library"
+	"github.com/VikingOwl91/mistral-go-sdk/library"
 )
 
 func newLibraryJSON() map[string]any {

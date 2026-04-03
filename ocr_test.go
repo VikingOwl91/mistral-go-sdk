@@ -7,7 +7,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"somegit.dev/vikingowl/mistral-go-sdk/ocr"
+	"github.com/VikingOwl91/mistral-go-sdk/ocr"
 )
 
 func TestOCR_Success(t *testing.T) {

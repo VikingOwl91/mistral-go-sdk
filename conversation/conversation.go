@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"somegit.dev/vikingowl/mistral-go-sdk/chat"
+	"github.com/VikingOwl91/mistral-go-sdk/chat"
 )
 
 // HandoffExecution controls tool call execution.
