@@ -8,7 +8,7 @@ import (
 	"strconv"
 	"time"
 
-	"somegit.dev/vikingowl/mistral-go-sdk/workflow"
+	"github.com/VikingOwl91/mistral-go-sdk/workflow"
 )
 
 // GetWorkflowExecution retrieves a workflow execution by ID.

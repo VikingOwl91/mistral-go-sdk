@@ -3,7 +3,7 @@ package conversation
 import (
 	"encoding/json"
 
-	"somegit.dev/vikingowl/mistral-go-sdk/chat"
+	"github.com/VikingOwl91/mistral-go-sdk/chat"
 )
 
 // StartRequest starts a new conversation.

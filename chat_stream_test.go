@@ -9,7 +9,7 @@ import (
 	"strings"
 	"testing"
 
-	"somegit.dev/vikingowl/mistral-go-sdk/chat"
+	"github.com/VikingOwl91/mistral-go-sdk/chat"
 )
 
 func TestChatCompleteStream_Success(t *testing.T) {
@@ -165,6 +165,7 @@ func TestChatCompleteStream_WithToolCalls(t *testing.T) {
 		w.Header().Set("Content-Type", "text/event-stream")
 		flusher, _ := w.(http.Flusher)
 
+		toolCalls := chat.FinishReasonToolCalls
 		chunk := chat.CompletionChunk{
 			ID:    "c",
 			Model: "m",
@@ -177,7 +178,9 @@ func TestChatCompleteStream_WithToolCalls(t *testing.T) {
 						Function: chat.FunctionCall{Name: "get_weather", Arguments: `{"city":"Paris"}`},
 					}},
 				},
+				FinishReason: &toolCalls,
 			}},
+			Usage: &chat.UsageInfo{PromptTokens: 10, CompletionTokens: 5, TotalTokens: 15},
 		}
 		data, _ := json.Marshal(chunk)
 		fmt.Fprintf(w, "data: %s\n\n", data)
@@ -199,9 +202,16 @@ func TestChatCompleteStream_WithToolCalls(t *testing.T) {
 	if !stream.Next() {
 		t.Fatalf("expected chunk, err: %v", stream.Err())
 	}
-	tc := stream.Current().Choices[0].Delta.ToolCalls
+	cur := stream.Current()
+	tc := cur.Choices[0].Delta.ToolCalls
 	if len(tc) != 1 || tc[0].Function.Name != "get_weather" {
 		t.Errorf("got tool calls %+v", tc)
+	}
+	if cur.Choices[0].FinishReason == nil || *cur.Choices[0].FinishReason != chat.FinishReasonToolCalls {
+		t.Errorf("expected finish_reason tool_calls, got %v", cur.Choices[0].FinishReason)
+	}
+	if cur.Usage == nil || cur.Usage.TotalTokens != 15 {
+		t.Errorf("expected usage with total_tokens=15, got %+v", cur.Usage)
 	}
 }
 

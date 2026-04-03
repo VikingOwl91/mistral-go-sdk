@@ -8,7 +8,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"somegit.dev/vikingowl/mistral-go-sdk/audio"
+	"github.com/VikingOwl91/mistral-go-sdk/audio"
 )
 
 func TestSpeech_Success(t *testing.T) {

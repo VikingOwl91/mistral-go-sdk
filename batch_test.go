@@ -7,7 +7,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"somegit.dev/vikingowl/mistral-go-sdk/batch"
+	"github.com/VikingOwl91/mistral-go-sdk/batch"
 )
 
 func TestCreateBatchJob_Success(t *testing.T) {

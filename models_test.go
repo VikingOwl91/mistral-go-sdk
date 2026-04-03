@@ -7,7 +7,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"somegit.dev/vikingowl/mistral-go-sdk/model"
+	"github.com/VikingOwl91/mistral-go-sdk/model"
 )
 
 func TestListModels_Success(t *testing.T) {

@@ -7,7 +7,7 @@ import (
 	"net/url"
 	"strconv"
 
-	"somegit.dev/vikingowl/mistral-go-sdk/conversation"
+	"github.com/VikingOwl91/mistral-go-sdk/conversation"
 )
 
 // StartConversation creates and starts a new conversation.

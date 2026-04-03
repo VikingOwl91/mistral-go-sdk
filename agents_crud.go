@@ -6,7 +6,7 @@ import (
 	"net/url"
 	"strconv"
 
-	"somegit.dev/vikingowl/mistral-go-sdk/agents"
+	"github.com/VikingOwl91/mistral-go-sdk/agents"
 )
 
 // CreateAgent creates a new agent.

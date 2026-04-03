@@ -3,7 +3,7 @@ package mistral
 import (
 	"context"
 
-	"somegit.dev/vikingowl/mistral-go-sdk/embedding"
+	"github.com/VikingOwl91/mistral-go-sdk/embedding"
 )
 
 // CreateEmbeddings sends an embedding request and returns the response.

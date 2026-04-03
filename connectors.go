@@ -6,7 +6,7 @@ import (
 	"net/url"
 	"strconv"
 
-	"somegit.dev/vikingowl/mistral-go-sdk/connector"
+	"github.com/VikingOwl91/mistral-go-sdk/connector"
 )
 
 // CreateConnector registers a new MCP connector.

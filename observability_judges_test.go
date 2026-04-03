@@ -7,7 +7,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"somegit.dev/vikingowl/mistral-go-sdk/observability"
+	"github.com/VikingOwl91/mistral-go-sdk/observability"
 )
 
 func judgeJSON() map[string]any {

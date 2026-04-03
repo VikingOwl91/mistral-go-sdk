@@ -1,3 +1,18 @@
+## v1.2.1 — 2026-04-03
+
+Move module path to `github.com/VikingOwl91/mistral-go-sdk` for public
+discoverability on pkg.go.dev.
+
+### Changed
+
+- Module path changed from `somegit.dev/vikingowl/mistral-go-sdk` to
+  `github.com/VikingOwl91/mistral-go-sdk`.
+
+### Fixed
+
+- `TestChatCompleteStream_WithToolCalls` fixture now includes `finish_reason`
+  and `usage` to match real Mistral API responses.
+
 ## v1.2.0 — 2026-04-02
 
 Upstream sync with Python SDK v2.2.0. Adds Workflows API and DeleteBatchJob.

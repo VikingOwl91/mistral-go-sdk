@@ -9,7 +9,7 @@ import (
 	"testing"
 	"time"
 
-	"somegit.dev/vikingowl/mistral-go-sdk/chat"
+	"github.com/VikingOwl91/mistral-go-sdk/chat"
 )
 
 func TestRetry_429ThenSuccess(t *testing.T) {

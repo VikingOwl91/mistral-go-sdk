@@ -8,8 +8,8 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"somegit.dev/vikingowl/mistral-go-sdk/chat"
-	"somegit.dev/vikingowl/mistral-go-sdk/fim"
+	"github.com/VikingOwl91/mistral-go-sdk/chat"
+	"github.com/VikingOwl91/mistral-go-sdk/fim"
 )
 
 func TestFIMComplete_Success(t *testing.T) {

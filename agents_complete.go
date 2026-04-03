@@ -3,8 +3,8 @@ package mistral
 import (
 	"context"
 
-	"somegit.dev/vikingowl/mistral-go-sdk/agents"
-	"somegit.dev/vikingowl/mistral-go-sdk/chat"
+	"github.com/VikingOwl91/mistral-go-sdk/agents"
+	"github.com/VikingOwl91/mistral-go-sdk/chat"
 )
 
 // AgentsComplete sends an agents completion request.

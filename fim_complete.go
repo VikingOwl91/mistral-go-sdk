@@ -3,8 +3,8 @@ package mistral
 import (
 	"context"
 
-	"somegit.dev/vikingowl/mistral-go-sdk/chat"
-	"somegit.dev/vikingowl/mistral-go-sdk/fim"
+	"github.com/VikingOwl91/mistral-go-sdk/chat"
+	"github.com/VikingOwl91/mistral-go-sdk/fim"
 )
 
 // FIMComplete sends a Fill-In-the-Middle completion request.

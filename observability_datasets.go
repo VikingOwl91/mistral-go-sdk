@@ -7,7 +7,7 @@ import (
 	"net/url"
 	"strconv"
 
-	"somegit.dev/vikingowl/mistral-go-sdk/observability"
+	"github.com/VikingOwl91/mistral-go-sdk/observability"
 )
 
 // CreateDataset creates a new observability dataset.

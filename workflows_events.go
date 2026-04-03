@@ -7,7 +7,7 @@ import (
 	"strconv"
 	"strings"
 
-	"somegit.dev/vikingowl/mistral-go-sdk/workflow"
+	"github.com/VikingOwl91/mistral-go-sdk/workflow"
 )
 
 // StreamWorkflowEvents streams workflow events via SSE.

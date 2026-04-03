@@ -8,8 +8,8 @@ import (
 	"strings"
 	"testing"
 
-	"somegit.dev/vikingowl/mistral-go-sdk/chat"
-	"somegit.dev/vikingowl/mistral-go-sdk/embedding"
+	"github.com/VikingOwl91/mistral-go-sdk/chat"
+	"github.com/VikingOwl91/mistral-go-sdk/embedding"
 )
 
 func integrationClient(t *testing.T) *Client {

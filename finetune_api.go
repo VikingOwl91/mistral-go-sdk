@@ -7,7 +7,7 @@ import (
 	"net/url"
 	"strconv"
 
-	"somegit.dev/vikingowl/mistral-go-sdk/finetune"
+	"github.com/VikingOwl91/mistral-go-sdk/finetune"
 )
 
 // CreateFineTuningJob creates a new fine-tuning job.

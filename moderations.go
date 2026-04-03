@@ -3,8 +3,8 @@ package mistral
 import (
 	"context"
 
-	"somegit.dev/vikingowl/mistral-go-sdk/classification"
-	"somegit.dev/vikingowl/mistral-go-sdk/moderation"
+	"github.com/VikingOwl91/mistral-go-sdk/classification"
+	"github.com/VikingOwl91/mistral-go-sdk/moderation"
 )
 
 // Moderate sends a text moderation request.

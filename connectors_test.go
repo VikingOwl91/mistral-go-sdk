@@ -7,7 +7,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"somegit.dev/vikingowl/mistral-go-sdk/connector"
+	"github.com/VikingOwl91/mistral-go-sdk/connector"
 )
 
 func TestCreateConnector_Success(t *testing.T) {

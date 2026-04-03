@@ -3,7 +3,7 @@ package mistral
 import (
 	"context"
 
-	"somegit.dev/vikingowl/mistral-go-sdk/ocr"
+	"github.com/VikingOwl91/mistral-go-sdk/ocr"
 )
 
 // OCR performs optical character recognition on a document.

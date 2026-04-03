@@ -1,6 +1,6 @@
 package classification
 
-import "somegit.dev/vikingowl/mistral-go-sdk/chat"
+import "github.com/VikingOwl91/mistral-go-sdk/chat"
 
 // Request represents a text classification request (/v1/classifications).
 type Request struct {

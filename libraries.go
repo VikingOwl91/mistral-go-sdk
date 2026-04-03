@@ -7,7 +7,7 @@ import (
 	"net/url"
 	"strconv"
 
-	"somegit.dev/vikingowl/mistral-go-sdk/library"
+	"github.com/VikingOwl91/mistral-go-sdk/library"
 )
 
 // CreateLibrary creates a new document library.
