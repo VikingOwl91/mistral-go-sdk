@@ -235,8 +235,9 @@ if err != nil {
 
 ## Upstream Reference
 
-This SDK tracks the [official Mistral Python SDK](https://github.com/mistralai/client-python)
-as its upstream reference for API surface and type definitions.
+This SDK tracks the [official Mistral OpenAPI spec](https://github.com/mistralai/platform-docs-public/blob/main/openapi.yaml) as its primary reference for API surface and type definitions. A daily GitHub Action monitors the spec for changes and opens an issue when updates are detected.
+
+The [Mistral Python SDK](https://github.com/mistralai/client-python) is used as a secondary reference for implementation patterns.
 
 | SDK Version | Upstream Python SDK |
 |-------------|---------------------|
