@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project
 
-Idiomatic Go SDK for the Mistral AI API. Module path: `github.com/VikingOwl91/mistral-go-sdk`. Requires Go 1.26+. Zero external dependencies (stdlib only). Tracks the upstream [Mistral Python SDK](https://github.com/mistralai/client-python) as reference for API surface and type definitions.
+Idiomatic Go SDK for the Mistral AI API. Module path: `github.com/VikingOwl91/mistral-go-sdk`. Requires Go 1.26+. Zero external dependencies (stdlib only). Tracks the [official Mistral OpenAPI spec](https://github.com/mistralai/platform-docs-public/blob/main/openapi.yaml) as primary reference for API surface and type definitions, with the [Mistral Python SDK](https://github.com/mistralai/client-python) as secondary reference for implementation patterns. A daily GitHub Action monitors the OpenAPI spec for changes.
 
 ## Repository layout
 
