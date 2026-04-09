@@ -1,0 +1,96 @@
+name: Watch Mistral OpenAPI Spec
+
+on:
+  schedule:
+    # Runs daily at 06:00 UTC
+    - cron: "0 6 * * *"
+  workflow_dispatch: # manual trigger for testing
+
+permissions:
+  contents: write
+  issues: write
+
+jobs:
+  check-spec:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Fetch and compare spec
+        id: check
+        run: |
+          if ! curl --fail -sL https://raw.githubusercontent.com/mistralai/platform-docs-public/main/openapi.yaml -o new-spec.yaml; then
+            echo "::error::Failed to download OpenAPI spec"
+            exit 1
+          fi
+
+          NEW_HASH=$(sha256sum new-spec.yaml | cut -d' ' -f1)
+
+          if [ -f .openapi-hash ]; then
+            OLD_HASH=$(cat .openapi-hash)
+          else
+            OLD_HASH="none"
+          fi
+
+          echo "old=$OLD_HASH" >> "$GITHUB_OUTPUT"
+          echo "new=$NEW_HASH" >> "$GITHUB_OUTPUT"
+
+          if [ "$NEW_HASH" != "$OLD_HASH" ]; then
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+
+            # Generate diff against stored spec for the issue body
+            if [ -f .openapi-spec.yaml ]; then
+              diff -u .openapi-spec.yaml new-spec.yaml > /tmp/spec-diff.txt || true
+            else
+              echo "No previous spec stored — first run after diff tracking was added." > /tmp/spec-diff.txt
+            fi
+          else
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Open issue on change
+        if: steps.check.outputs.changed == 'true'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            let diff = fs.readFileSync('/tmp/spec-diff.txt', 'utf8');
+
+            // Truncate if too long for issue body
+            if (diff.length > 50000) {
+              diff = diff.substring(0, 50000) + '\n\n... (truncated — view full spec for details)';
+            }
+
+            const issues = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              labels: 'openapi-update',
+              state: 'open'
+            });
+
+            if (issues.data.length === 0) {
+              await github.rest.issues.create({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                title: '⚠️ Mistral OpenAPI spec has changed',
+                body: `The upstream OpenAPI spec has been updated.\n\n` +
+                      `**Old hash:** \`${{ steps.check.outputs.old }}\`\n` +
+                      `**New hash:** \`${{ steps.check.outputs.new }}\`\n\n` +
+                      `[View spec](https://github.com/mistralai/platform-docs-public/blob/main/openapi.yaml)\n\n` +
+                      `### Diff\n\`\`\`diff\n${diff}\n\`\`\`\n\n` +
+                      `### TODO\n- [ ] Review spec changes\n- [ ] Update SDK types\n- [ ] Run tests\n- [ ] Update .openapi-hash`,
+                labels: ['openapi-update']
+              });
+            }
+
+      - name: Update stored hash and spec
+        if: steps.check.outputs.changed == 'true'
+        run: |
+          echo "${{ steps.check.outputs.new }}" > .openapi-hash
+          cp new-spec.yaml .openapi-spec.yaml
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add .openapi-hash .openapi-spec.yaml
+          git commit -m "chore: update openapi spec hash"
+          git push
