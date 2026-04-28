@@ -1,14 +1,61 @@
-## Unreleased
+## v1.4.0 — 2026-04-28
+
+Spec/SDK alignment pass after upstream OpenAPI moved to v1.0.0 and
+Python SDK shipped v2.3.0..v2.4.3. RAG ingestion-pipeline beta surface
+(Python v2.4.3) intentionally deferred until the dust settles upstream.
+
+### Added
+
+- **`Client.GetWorkflowWorkerInfo`** — restores the
+  `GET /v1/workflows/workers/whoami` endpoint that was removed in v1.3.0.
+  The endpoint is still in the spec and is needed by callers running
+  custom workers that connect their own scheduler.
+  (`workflow.WorkerInfo` type.)
+- **Observability fields API** — three GETs missing since the
+  observability surface was first added:
+  - `Client.GetChatCompletionFields` (`/v1/observability/chat-completion-fields`)
+  - `Client.GetChatCompletionFieldOptions` (`…/{field}/options?operator=…`)
+  - `Client.GetChatCompletionFieldOptionsCounts` (`…/{field}/options-counts`)
+  - new types: `observability.BaseFieldDefinition`, `FieldGroup`,
+    `ChatCompletionFields`, `ChatCompletionFieldOptions`,
+    `FieldOptionCountsRequest`, `FieldOptionCounts`, `FieldOptionCountItem`,
+    plus `FieldType` and `FieldOperator` typed enums.
+- **Workflow payload encoding constants** — `workflow.EncodedPayloadOption`
+  with `EncodedPayloadOffloaded`, `EncodedPayloadEncrypted`,
+  `EncodedPayloadEncryptedPartial`. Wire-compatible refinement of the
+  pre-existing `[]string` field on `NetworkEncodedInput`.
+  (Mirrors Python SDK v2.4.0.)
+- **Workflow ↔ connector integration** (Python SDK v2.4.2):
+  - `workflow.ConnectorSlot`, `ConnectorBindings`, `ConnectorExtensions`,
+    `WorkflowExtensions` types.
+  - `workflow.BuildConnectorExtensions(slots …)` helper that produces the
+    nested map expected at `ExecutionRequest.Extensions["mistralai"]`.
+  - `workflow.ConnectorAuthTaskState` + `ConnectorAuthStatus` constants
+    for parsing payloads emitted by the `connector-auth` custom task event.
+  - New `Extensions map[string]any` field on `workflow.ExecutionRequest`.
+- **HITL (human-in-the-loop) confirmation constants** — typed values
+  alongside the pre-existing `conversation.ToolCallConfirmation` and
+  `tool_confirmations` field:
+  - `conversation.Confirmation` with `ConfirmationAllow` / `ConfirmationDeny`
+    for the reply side.
+  - `ConfirmationStatusPending` / `ConfirmationStatusAllowed` /
+    `ConfirmationStatusDenied` for `FunctionCallEvent.ConfirmationStatus`
+    and `FunctionCallEntry.ConfirmationStatus` (already present as
+    untyped strings).
 
 ### Changed
 
+- `workflow.NetworkEncodedInput.EncodingOptions` is now
+  `[]EncodedPayloadOption` (string-typed alias). JSON wire format
+  unchanged; existing call sites that passed `[]string{"offloaded"}`
+  need to switch to `[]workflow.EncodedPayloadOption{workflow.EncodedPayloadOffloaded}`
+  or the typed constants directly.
 - Tracking upstream Mistral OpenAPI spec **v1.0.0** (was v0.1.104).
-  No SDK surface change: the only spec delta in this window was the
-  removal of OCR confidence-score fields
-  (`OCRPageObject.confidence_scores`, `OCRRequest.confidence_scores_granularity`,
+  Only spec delta in this window was the removal of OCR confidence-score
+  fields (`OCRPageObject.confidence_scores`,
+  `OCRRequest.confidence_scores_granularity`,
   `OCRTableObject.word_confidence_scores`, plus the `OCRConfidenceScore`
-  and `OCRPageConfidenceScores` schemas), none of which were exposed by
-  this SDK.
+  and `OCRPageConfidenceScores` schemas), none of which this SDK exposed.
 
 ### Fixed (CI)
 

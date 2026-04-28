@@ -44,10 +44,30 @@ type CompletionArgs struct {
 	ToolChoice       *chat.ToolChoiceMode `json:"tool_choice,omitempty"`
 }
 
+// Confirmation is a client decision on a pending tool call.
+type Confirmation string
+
+const (
+	ConfirmationAllow Confirmation = "allow"
+	ConfirmationDeny  Confirmation = "deny"
+)
+
+// ConfirmationStatus values appear on FunctionCallEvent.ConfirmationStatus
+// and FunctionCallEntry.ConfirmationStatus, reporting where in the
+// human-in-the-loop flow a tool call currently sits.
+const (
+	ConfirmationStatusPending = "pending"
+	ConfirmationStatusAllowed = "allowed"
+	ConfirmationStatusDenied  = "denied"
+)
+
 // ToolCallConfirmation confirms or denies a pending tool call.
+//
+// Send a slice of these on AppendRequest.ToolConfirmations after receiving
+// a function call event whose ConfirmationStatus is "pending".
 type ToolCallConfirmation struct {
 	ToolCallID   string `json:"tool_call_id"`
-	Confirmation string `json:"confirmation"` // "allow" or "deny"
+	Confirmation string `json:"confirmation"` // use ConfirmationAllow / ConfirmationDeny
 }
 
 // Inputs represents conversation inputs (text string or entry array).

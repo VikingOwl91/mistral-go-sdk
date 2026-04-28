@@ -25,6 +25,9 @@ type ExecutionRequest struct {
 	TimeoutSeconds          *float64             `json:"timeout_seconds,omitempty"`
 	CustomTracingAttributes map[string]string    `json:"custom_tracing_attributes,omitempty"`
 	DeploymentName          *string              `json:"deployment_name,omitempty"`
+	// Extensions carries plugin-specific data such as connector bindings.
+	// Use BuildConnectorExtensions to construct the standard connector shape.
+	Extensions map[string]any `json:"extensions,omitempty"`
 }
 
 // ExecutionResponse is the response from a workflow execution.
@@ -40,11 +43,20 @@ type ExecutionResponse struct {
 	TotalDurationMs   *int            `json:"total_duration_ms,omitempty"`
 }
 
+// EncodedPayloadOption identifies how a workflow payload was encoded.
+type EncodedPayloadOption string
+
+const (
+	EncodedPayloadOffloaded        EncodedPayloadOption = "offloaded"
+	EncodedPayloadEncrypted        EncodedPayloadOption = "encrypted"
+	EncodedPayloadEncryptedPartial EncodedPayloadOption = "encrypted-partial"
+)
+
 // NetworkEncodedInput holds a base64-encoded payload for workflow input.
 type NetworkEncodedInput struct {
-	B64Payload      string   `json:"b64payload"`
-	EncodingOptions []string `json:"encoding_options,omitempty"`
-	Empty           bool     `json:"empty,omitempty"`
+	B64Payload      string                 `json:"b64payload"`
+	EncodingOptions []EncodedPayloadOption `json:"encoding_options,omitempty"`
+	Empty           bool                   `json:"empty,omitempty"`
 }
 
 // SignalInvocationBody is the request body for signaling a workflow execution.

@@ -11,7 +11,7 @@ The most complete Go client for the [Mistral AI API](https://docs.mistral.ai/).
 
 **Zero dependencies.** The entire SDK — including tests — uses only the Go standard library. No `go.sum`, no transitive dependency tree to audit, no version conflicts, no supply chain risk.
 
-**Full API coverage.** 165 methods across every Mistral endpoint — including Workflows, Connectors, Audio Speech/Voices, Conversations, Agents CRUD, Libraries, OCR, Observability, Fine-tuning, and Batch Jobs. No other Go SDK covers Workflows, Conversations, Connectors, or Observability.
+**Full API coverage.** 169 methods across every Mistral endpoint — including Workflows (with worker introspection and connector bindings), Connectors, Audio Speech/Voices, Conversations (including human-in-the-loop tool confirmations), Agents CRUD, Libraries, OCR, Observability (events, judges, datasets, campaigns, fields), Fine-tuning, and Batch Jobs. No other Go SDK covers Workflows, Conversations, Connectors, or Observability.
 
 **Typed streaming.** A generic pull-based `Stream[T]` iterator — no channels, no goroutines, no leaks. Just `Next()` / `Current()` / `Err()` / `Close()`.
 
@@ -19,7 +19,7 @@ The most complete Go client for the [Mistral AI API](https://docs.mistral.ai/).
 
 **Hand-written, not generated.** Idiomatic Go with sealed interfaces, discriminated unions, and functional options — not a Speakeasy/OpenAPI auto-gen dump with `any` everywhere.
 
-**Test-driven.** 284 tests with race detection clean. Every endpoint tested against mock servers; integration tests against the real API.
+**Test-driven.** 297 tests with race detection clean. Every endpoint tested against mock servers; integration tests against the real API.
 
 ## Install
 
@@ -132,7 +132,7 @@ for stream.Next() {
 
 ## API Coverage
 
-165 public methods on `Client`, grouped by domain:
+169 public methods on `Client`, grouped by domain:
 
 | Domain | Methods |
 |--------|---------|
@@ -156,6 +156,7 @@ for stream.Next() {
 | **Classification** | `Classify`, `ClassifyChat` |
 | **Observability (campaigns)** | `CreateCampaign`, `ListCampaigns`, `GetCampaign`, `DeleteCampaign`, `GetCampaignStatus`, `ListCampaignEvents` |
 | **Observability (events)** | `SearchChatCompletionEvents`, `SearchChatCompletionEventIDs`, `GetChatCompletionEvent`, `GetSimilarChatCompletionEvents`, `JudgeChatCompletionEvent` |
+| **Observability (fields)** | `GetChatCompletionFields`, `GetChatCompletionFieldOptions`, `GetChatCompletionFieldOptionsCounts` |
 | **Observability (judges)** | `CreateJudge`, `ListJudges`, `GetJudge`, `UpdateJudge`, `DeleteJudge`, `JudgeConversation` |
 | **Observability (datasets)** | `CreateDataset`, `ListDatasets`, `GetDataset`, `UpdateDataset`, `DeleteDataset`, `ExportDatasetToJSONL`, `ListDatasetRecords`, `CreateDatasetRecord`, `GetDatasetRecord`, `UpdateDatasetRecordPayload`, `UpdateDatasetRecordProperties`, `DeleteDatasetRecord`, `BulkDeleteDatasetRecords`, `JudgeDatasetRecord`, `ImportDatasetFromCampaign`, `ImportDatasetFromExplorer`, `ImportDatasetFromFile`, `ImportDatasetFromPlayground`, `ImportDatasetFromDataset`, `ListDatasetTasks`, `GetDatasetTask` |
 | **Workflows (CRUD)** | `ListWorkflows`, `GetWorkflow`, `UpdateWorkflow`, `ArchiveWorkflow`, `UnarchiveWorkflow`, `ExecuteWorkflow`, `ExecuteWorkflowAndWait` |
@@ -167,6 +168,7 @@ for stream.Next() {
 | **Workflows (metrics)** | `GetWorkflowMetrics` |
 | **Workflows (runs)** | `ListWorkflowRuns`, `GetWorkflowRun`, `GetWorkflowRunHistory` |
 | **Workflows (schedules)** | `ListWorkflowSchedules`, `ScheduleWorkflow`, `UnscheduleWorkflow` |
+| **Workflows (workers)** | `GetWorkflowWorkerInfo` |
 
 ## Comparison
 
@@ -239,13 +241,14 @@ This SDK tracks the [official Mistral OpenAPI spec](https://github.com/mistralai
 
 The [Mistral Python SDK](https://github.com/mistralai/client-python) is used as a secondary reference for implementation patterns.
 
-| SDK Version | Upstream Python SDK |
-|-------------|---------------------|
-| v1.3.0 | v2.3.0 |
-| v1.2.1 | v2.2.0 |
-| v1.2.0 | v2.2.0 |
-| v1.1.0 | v2.1.3 |
-| v1.0.0 | v2.0.4 |
+| SDK Version | Upstream Python SDK | Upstream OpenAPI |
+|-------------|---------------------|------------------|
+| v1.4.0 | v2.4.3 (excl. RAG ingestion-pipeline beta) | v1.0.0 |
+| v1.3.0 | v2.3.0 | v0.1.104 |
+| v1.2.1 | v2.2.0 | — |
+| v1.2.0 | v2.2.0 | — |
+| v1.1.0 | v2.1.3 | — |
+| v1.0.0 | v2.0.4 | — |
 
 ## License
 
