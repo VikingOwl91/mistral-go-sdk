@@ -1,25 +1,32 @@
 # mistral-go-sdk
 
-The most complete Go client for the [Mistral AI API](https://docs.mistral.ai/).
+Go SDK for Mistral's agentic stack — Workflows, Conversations, Connectors — with full coverage of the rest of the Mistral AI API.
 
 <!-- Badges -->
 [![Go Reference](https://pkg.go.dev/badge/github.com/VikingOwl91/mistral-go-sdk.svg)](https://pkg.go.dev/github.com/VikingOwl91/mistral-go-sdk)
 ![Go Version](https://img.shields.io/badge/go-1.26-blue)
 ![License](https://img.shields.io/badge/license-MIT-green)
 
-## Why This SDK?
+## What this is for
 
-**Zero dependencies.** The entire SDK — including tests — uses only the Go standard library. No `go.sum`, no transitive dependency tree to audit, no version conflicts, no supply chain risk.
+Mistral's `/v1/chat/completions` endpoint is OpenAI-wire-compatible, so if all you need is plain chat or tool calling, pointing any OpenAI Go client at `https://api.mistral.ai/v1` already works. **This SDK exists for the rest of Mistral's surface** — the parts no other Go client covers:
 
-**Full API coverage.** 169 methods across every Mistral endpoint — including Workflows (with worker introspection and connector bindings), Connectors, Audio Speech/Voices, Conversations (including human-in-the-loop tool confirmations), Agents CRUD, Libraries, OCR, Observability (events, judges, datasets, campaigns, fields), Fine-tuning, and Batch Jobs. No other Go SDK covers Workflows, Conversations, Connectors, or Observability.
+- **Workflows** — durable, long-running executions with signals, queries, updates, and full event streaming.
+- **Conversations API** — server-stored multi-turn state with streaming events, agent handoffs, and human-in-the-loop tool confirmations.
+- **Connectors / MCP** — manage MCP connectors and bind them to workflow executions.
+- **Agents CRUD** — create, version, and alias agents (not just `agents/completions`).
+- **Libraries / Documents** — RAG document stores with reprocess, status, and signed-URL retrieval.
+- **OCR, Audio (transcription + TTS + voices), Fine-tuning, Batch, Observability, Moderation, Classification.**
 
-**Typed streaming.** A generic pull-based `Stream[T]` iterator — no channels, no goroutines, no leaks. Just `Next()` / `Current()` / `Err()` / `Close()`.
+If your use case is "Go program calls Mistral and gets a response back," any OpenAI-compatible client is the easier path. If you need agentic workflows or stateful conversations from Go, this is the only option.
 
-**Forward-compatible.** Unknown types (`UnknownEntry`, `UnknownEvent`, `UnknownMessage`, `UnknownChunk`, `UnknownAgentTool`, workflow `UnknownEvent`) capture raw JSON instead of returning errors. When Mistral ships a new message role or event type, your code keeps running — it doesn't panic.
+## Why this SDK
 
-**Hand-written, not generated.** Idiomatic Go with sealed interfaces, discriminated unions, and functional options — not a Speakeasy/OpenAPI auto-gen dump with `any` everywhere.
-
-**Test-driven.** 297 tests with race detection clean. Every endpoint tested against mock servers; integration tests against the real API.
+- **Zero dependencies.** Stdlib-only. No `go.sum`, no transitive tree, no supply chain.
+- **Hand-written, not generated.** Idiomatic Go with sealed interfaces, discriminated unions, and functional options — not a Speakeasy/OpenAPI dump with `any` everywhere.
+- **Forward-compatible types.** `UnknownEntry`, `UnknownEvent`, `UnknownMessage`, `UnknownChunk`, `UnknownAgentTool` capture raw JSON instead of returning errors — when Mistral ships a new event type, your code keeps running.
+- **Typed streaming.** Generic pull-based `Stream[T]` iterator — no channels, no goroutines, no leaks. Just `Next()` / `Current()` / `Err()` / `Close()`.
+- **Test-driven.** 297 tests, race-clean. Every endpoint has a mock-server unit test; integration tests run against the real API behind a build tag.
 
 ## Install
 
@@ -29,44 +36,58 @@ go get github.com/VikingOwl91/mistral-go-sdk
 
 ## Quick Start
 
-### Chat Completion
+### Execute a workflow with connector bindings
+
+The most differentiated thing this SDK does. Run a registered workflow, hand it the MCP connectors it needs, and block until completion:
 
 ```go
 package main
 
 import (
     "context"
+    "encoding/json"
     "fmt"
     "log"
 
     mistral "github.com/VikingOwl91/mistral-go-sdk"
-    "github.com/VikingOwl91/mistral-go-sdk/chat"
+    "github.com/VikingOwl91/mistral-go-sdk/workflow"
 )
 
 func main() {
     client := mistral.NewClient("sk-your-api-key")
 
-    resp, err := client.ChatComplete(context.Background(), &chat.CompletionRequest{
-        Model: "mistral-small-latest",
-        Messages: []chat.Message{
-            &chat.UserMessage{Content: chat.TextContent("What is the capital of France?")},
+    creds := "work-account"
+    resp, err := client.ExecuteWorkflowAndWait(context.Background(), "my-workflow", &workflow.ExecutionRequest{
+        Input: map[string]any{
+            "topic": "Q3 earnings",
         },
+        Extensions: workflow.BuildConnectorExtensions(
+            workflow.ConnectorSlot{ConnectorName: "gmail"},
+            workflow.ConnectorSlot{ConnectorName: "notion", CredentialsName: &creds},
+        ),
     })
     if err != nil {
         log.Fatal(err)
     }
-    fmt.Println(resp.Choices[0].Message.Content)
+
+    fmt.Printf("execution %s finished with status %s\n", resp.ExecutionID, resp.Status)
+    if resp.Status == workflow.ExecutionCompleted {
+        result, _ := json.MarshalIndent(resp.Result, "", "  ")
+        fmt.Println(string(result))
+    }
 }
 ```
 
-### Streaming
+### Stream a conversation with tool-call confirmation
+
+Conversations keep server-side state across turns. Stream events, accept or deny pending tool calls, and continue:
 
 ```go
-stream, err := client.ChatCompleteStream(ctx, &chat.CompletionRequest{
-    Model: "mistral-small-latest",
-    Messages: []chat.Message{
-        &chat.UserMessage{Content: chat.TextContent("Tell me a joke.")},
-    },
+import "github.com/VikingOwl91/mistral-go-sdk/conversation"
+
+stream, err := client.StartConversationStream(ctx, &conversation.StartRequest{
+    AgentID: "ag-your-agent-id",
+    Inputs:  conversation.TextInputs("Summarize today's incident review and email it to the on-call channel."),
 })
 if err != nil {
     log.Fatal(err)
@@ -74,9 +95,20 @@ if err != nil {
 defer stream.Close()
 
 for stream.Next() {
-    chunk := stream.Current()
-    if len(chunk.Choices) > 0 {
-        fmt.Print(chunk.Choices[0].Delta.Content)
+    event := stream.Current()
+    switch e := event.(type) {
+    case *conversation.FunctionCallEvent:
+        if e.ConfirmationStatus != nil && *e.ConfirmationStatus == conversation.ConfirmationStatusPending {
+            // Hand the user a confirmation prompt; reply on the next AppendConversation.
+            confirmations := []conversation.ToolCallConfirmation{
+                {ToolCallID: e.ToolCallID, Confirmation: string(conversation.ConfirmationAllow)},
+            }
+            _, _ = client.AppendConversation(ctx, /* conversationID */ "conv-...", &conversation.AppendRequest{
+                ToolConfirmations: confirmations,
+            })
+        }
+    case *conversation.MessageOutputEntry:
+        // assistant tokens
     }
 }
 if err := stream.Err(); err != nil {
@@ -84,49 +116,62 @@ if err := stream.Err(); err != nil {
 }
 ```
 
-### Tool Calling
+### Chat completion (when that's all you need)
 
 ```go
+import "github.com/VikingOwl91/mistral-go-sdk/chat"
+
 resp, err := client.ChatComplete(ctx, &chat.CompletionRequest{
     Model: "mistral-small-latest",
     Messages: []chat.Message{
-        &chat.UserMessage{Content: chat.TextContent("What's the weather in Paris?")},
+        &chat.UserMessage{Content: chat.TextContent("What is the capital of France?")},
     },
-    Tools: []chat.Tool{{
-        Type: "function",
-        Function: chat.Function{
-            Name:        "get_weather",
-            Description: "Get weather for a city",
-            Parameters: map[string]any{
-                "type": "object",
-                "properties": map[string]any{
-                    "city": map[string]any{"type": "string"},
-                },
-                "required": []string{"city"},
-            },
-        },
-    }},
 })
+if err != nil {
+    log.Fatal(err)
+}
+fmt.Println(resp.Choices[0].Message.Content)
 ```
 
-### Conversations
+If this is your whole use case, the OpenAI-wire-compatible endpoint is also a valid path — point any `openai-go` client at `https://api.mistral.ai/v1` and it works. The rest of this SDK is for what the OpenAI shape doesn't cover.
+
+## Configuration
 
 ```go
-import "github.com/VikingOwl91/mistral-go-sdk/conversation"
+client := mistral.NewClient("sk-...",
+    mistral.WithBaseURL("https://custom-endpoint.example.com"),
+    mistral.WithHTTPClient(customHTTPClient),
+    mistral.WithTimeout(30 * time.Second),
+    mistral.WithRetry(3, 500*time.Millisecond),
+)
+```
 
-resp, err := client.StartConversation(ctx, &conversation.StartRequest{
-    AgentID: "ag-your-agent-id",
-    Inputs:  conversation.TextInputs("Hello, agent!"),
-})
+| Option | Description |
+|--------|-------------|
+| `WithBaseURL(url)` | Override the API base URL (default: `https://api.mistral.ai`) |
+| `WithHTTPClient(client)` | Use a custom `*http.Client` |
+| `WithTimeout(d)` | Set HTTP client timeout (default: 120s) |
+| `WithRetry(n, delay)` | Enable retry with exponential backoff + jitter on 429/5xx |
 
-// Stream events
-stream, err := client.AppendConversationStream(ctx, resp.ConversationID, &conversation.AppendRequest{
-    Inputs: conversation.TextInputs("Follow-up question"),
-})
-defer stream.Close()
-for stream.Next() {
-    event := stream.Current()
-    // handle typed events
+## Error Handling
+
+```go
+resp, err := client.ChatComplete(ctx, req)
+if err != nil {
+    var apiErr *mistral.APIError
+    if errors.As(err, &apiErr) {
+        fmt.Printf("Status: %d, Message: %s\n", apiErr.StatusCode, apiErr.Message)
+    }
+
+    if mistral.IsRateLimit(err) {
+        // 429 — back off and retry
+    }
+    if mistral.IsNotFound(err) {
+        // 404 — resource not found
+    }
+    if mistral.IsAuth(err) {
+        // 401 — invalid API key
+    }
 }
 ```
 
@@ -195,49 +240,9 @@ There is no official Go SDK from Mistral AI (only Python and TypeScript). The ma
 | Forward-compatible types | Yes | No | No | No |
 | Last updated | 2026 | Jun 2024 | Jan 2024 | ~2025 (fork of Gage) |
 
-## Configuration
-
-```go
-client := mistral.NewClient("sk-...",
-    mistral.WithBaseURL("https://custom-endpoint.example.com"),
-    mistral.WithHTTPClient(customHTTPClient),
-    mistral.WithTimeout(30 * time.Second),
-    mistral.WithRetry(3, 500*time.Millisecond),
-)
-```
-
-| Option | Description |
-|--------|-------------|
-| `WithBaseURL(url)` | Override the API base URL (default: `https://api.mistral.ai`) |
-| `WithHTTPClient(client)` | Use a custom `*http.Client` |
-| `WithTimeout(d)` | Set HTTP client timeout (default: 120s) |
-| `WithRetry(n, delay)` | Enable retry with exponential backoff + jitter on 429/5xx |
-
-## Error Handling
-
-```go
-resp, err := client.ChatComplete(ctx, req)
-if err != nil {
-    var apiErr *mistral.APIError
-    if errors.As(err, &apiErr) {
-        fmt.Printf("Status: %d, Message: %s\n", apiErr.StatusCode, apiErr.Message)
-    }
-
-    if mistral.IsRateLimit(err) {
-        // 429 — back off and retry
-    }
-    if mistral.IsNotFound(err) {
-        // 404 — resource not found
-    }
-    if mistral.IsAuth(err) {
-        // 401 — invalid API key
-    }
-}
-```
-
 ## Upstream Reference
 
-This SDK tracks the [official Mistral OpenAPI spec](https://github.com/mistralai/platform-docs-public/blob/main/openapi.yaml) as its primary reference for API surface and type definitions. A daily GitHub Action monitors the spec for changes and opens an issue when updates are detected.
+This SDK tracks the [official Mistral OpenAPI spec](https://github.com/mistralai/platform-docs-public/blob/main/openapi.yaml) as its primary reference for API surface and type definitions. A daily GitHub Action monitors the spec for changes and refreshes a tracking issue when updates are detected.
 
 The [Mistral Python SDK](https://github.com/mistralai/client-python) is used as a secondary reference for implementation patterns.
 
