@@ -7,7 +7,7 @@ on:
   workflow_dispatch: # manual trigger for testing
 
 permissions:
-  contents: write
+  contents: read
   issues: write
 
 jobs:
@@ -39,28 +39,50 @@ jobs:
           if [ "$NEW_HASH" != "$OLD_HASH" ]; then
             echo "changed=true" >> "$GITHUB_OUTPUT"
 
-            # Generate diff against stored spec for the issue body
+            # Diff against the in-tree baseline (.openapi-spec.yaml).
+            # Maintainer commits a fresh baseline when addressing the issue.
             if [ -f .openapi-spec.yaml ]; then
               diff -u .openapi-spec.yaml new-spec.yaml > /tmp/spec-diff.txt || true
             else
-              echo "No previous spec stored — first run after diff tracking was added." > /tmp/spec-diff.txt
+              echo "No baseline .openapi-spec.yaml in repo - commit one to enable diffs." > /tmp/spec-diff.txt
             fi
           else
             echo "changed=false" >> "$GITHUB_OUTPUT"
           fi
 
-      - name: Open issue on change
+      - name: Open or refresh tracking issue
         if: steps.check.outputs.changed == 'true'
         uses: actions/github-script@v7
+        env:
+          OLD_HASH: ${{ steps.check.outputs.old }}
+          NEW_HASH: ${{ steps.check.outputs.new }}
         with:
           script: |
             const fs = require('fs');
             let diff = fs.readFileSync('/tmp/spec-diff.txt', 'utf8');
 
-            // Truncate if too long for issue body
+            // Truncate if too long for issue body (GitHub issue body limit is 65536 chars)
             if (diff.length > 50000) {
-              diff = diff.substring(0, 50000) + '\n\n... (truncated — view full spec for details)';
+              diff = diff.substring(0, 50000) + '\n\n... (truncated - view full spec for details)';
             }
+
+            const oldHash = process.env.OLD_HASH;
+            const newHash = process.env.NEW_HASH;
+
+            const body =
+              `The upstream OpenAPI spec has changed and the SDK is out of sync.\n\n` +
+              `**Stored hash (.openapi-hash):** \`${oldHash}\`\n` +
+              `**Current upstream hash:** \`${newHash}\`\n` +
+              `_Last refreshed: ${new Date().toISOString()}_\n\n` +
+              `[View upstream spec](https://github.com/mistralai/platform-docs-public/blob/main/openapi.yaml)\n\n` +
+              `### Diff vs in-tree baseline\n\`\`\`diff\n${diff}\n\`\`\`\n\n` +
+              `### TODO\n` +
+              `- [ ] Review spec changes\n` +
+              `- [ ] Update SDK types if needed\n` +
+              `- [ ] Run tests\n` +
+              `- [ ] Bump \`.openapi-hash\` and refresh \`.openapi-spec.yaml\` in same commit\n` +
+              `- [ ] Close this issue\n\n` +
+              `<sub>This issue body is rewritten by the watcher each run, so the diff and hashes always reflect the latest upstream state.</sub>`;
 
             const issues = await github.rest.issues.listForRepo({
               owner: context.repo.owner,
@@ -73,24 +95,38 @@ jobs:
               await github.rest.issues.create({
                 owner: context.repo.owner,
                 repo: context.repo.repo,
-                title: '⚠️ Mistral OpenAPI spec has changed',
-                body: `The upstream OpenAPI spec has been updated.\n\n` +
-                      `**Old hash:** \`${{ steps.check.outputs.old }}\`\n` +
-                      `**New hash:** \`${{ steps.check.outputs.new }}\`\n\n` +
-                      `[View spec](https://github.com/mistralai/platform-docs-public/blob/main/openapi.yaml)\n\n` +
-                      `### Diff\n\`\`\`diff\n${diff}\n\`\`\`\n\n` +
-                      `### TODO\n- [ ] Review spec changes\n- [ ] Update SDK types\n- [ ] Run tests\n- [ ] Update .openapi-hash`,
+                title: 'Mistral OpenAPI spec has changed',
+                body,
                 labels: ['openapi-update']
               });
+              return;
             }
 
-      - name: Update stored hash and spec
-        if: steps.check.outputs.changed == 'true'
-        run: |
-          echo "${{ steps.check.outputs.new }}" > .openapi-hash
-          cp new-spec.yaml .openapi-spec.yaml
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add .openapi-hash .openapi-spec.yaml
-          git commit -m "chore: update openapi spec hash"
-          git push
+            // Refresh the existing open issue so the diff/hashes never go stale.
+            const issue = issues.data[0];
+
+            // Detect whether upstream moved *again* since the last refresh by
+            // parsing the previous "Current upstream hash" out of the issue body.
+            const marker = /\*\*Current upstream hash:\*\* `([a-f0-9]{64})`/;
+            const prev = (issue.body || '').match(marker);
+            const movedAgain = prev && prev[1] !== newHash;
+
+            await github.rest.issues.update({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: issue.number,
+              body
+            });
+
+            if (movedAgain) {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issue.number,
+                body:
+                  `Upstream spec moved again since this issue was last refreshed.\n\n` +
+                  `Previous upstream hash: \`${prev[1]}\`\n` +
+                  `New upstream hash: \`${newHash}\`\n\n` +
+                  `Issue body has been updated to the latest diff.`
+              });
+            }

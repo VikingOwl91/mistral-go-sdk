@@ -1,3 +1,25 @@
+## Unreleased
+
+### Changed
+
+- Tracking upstream Mistral OpenAPI spec **v1.0.0** (was v0.1.104).
+  No SDK surface change: the only spec delta in this window was the
+  removal of OCR confidence-score fields
+  (`OCRPageObject.confidence_scores`, `OCRRequest.confidence_scores_granularity`,
+  `OCRTableObject.word_confidence_scores`, plus the `OCRConfidenceScore`
+  and `OCRPageConfidenceScores` schemas), none of which were exposed by
+  this SDK.
+
+### Fixed (CI)
+
+- `watch-openapi.yml` no longer attempts to commit `.openapi-hash` /
+  `.openapi-spec.yaml` to `main`. The push was being silently reverted
+  by an upstream mirror, leaving the tracking issue stale across
+  multiple upstream releases. The watcher now refreshes the open
+  tracking issue's body on each run so the diff and hashes always
+  reflect the current upstream state, and posts a comment when the
+  spec moves again while the issue is still open.
+
 ## v1.3.0 — 2026-04-03
 
 Upstream sync with Python SDK v2.3.0. Updates workflow registration model
